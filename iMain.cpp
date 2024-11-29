@@ -110,12 +110,12 @@ char symbol_2 = 'o';
 
 void playmusic(){
 	if(current == 0){
-		PlaySound("resources\\home.wav", NULL, SND_LOOP | SND_ASYNC);
+		PlaySound("home.wav", NULL, SND_LOOP | SND_ASYNC);
 	}
 }
 void nevigate(int button, int state, int mx, int my){
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		PlaySound("resources\\move.wav", NULL, SND_ASYNC);
+		PlaySound("move.wav", NULL, SND_ASYNC);
 		if(mx >= 601 && mx <= 991 && my >= 259 && my <= 310){
 			exit(0);
 		}
@@ -335,111 +335,111 @@ void iDraw()
 
 	iClear();
 	if(current == 0){
-	iShowBMP(0, 0, "resources\\Game_homepage.bmp");
+	iShowBMP(0, 0, "Game_homepage.bmp");
 	}
 	if(current > 0){
-	iShowBMP(0, 0, "resources\\project_bg.bmp");
-	iShowBMP(300, 140, "resources\\tic_tac_game-crop (2).bmp");
-	iShowBMP(300, 642, "resources\\tic_tac_game-crop (2).bmp");
-	iShowBMP(800, 140, "resources\\tic_tac_game-crop (2).bmp");
-	iShowBMP(800, 642, "resources\\tic_tac_game-crop (2).bmp");
+	iShowBMP(0, 0, "project_bg.bmp");
+	iShowBMP(300, 140, "tic_tac_game-crop (2).bmp");
+	iShowBMP(300, 642, "tic_tac_game-crop (2).bmp");
+	iShowBMP(800, 140, "tic_tac_game-crop (2).bmp");
+	iShowBMP(800, 642, "tic_tac_game-crop (2).bmp");
 	
 	
 	if(checkWin(board_1, 'x')){
 		x_s_point += 1;
-		iShowBMP(340,564,"resources\\xwon.bmp");
-		iShowBMP(340,180, "resources\\X_win.bmp");
+		iShowBMP(340,564,"xwon.bmp");
+		iShowBMP(340,180, "X_win.bmp");
 		if(data1 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data1 = 0;
 		}
 		
 	}else if(!checkWin(board_1, 'o')){
 	if (block1_1 == 1)
 	{
-		iShowBMP2(360, 200, "resources\\cross.bmp", 0);
+		iShowBMP2(360, 200, "cross.bmp", 0);
 		
 	}
 	if (block1_2 == 1)
 	{
-		iShowBMP2(500, 200, "resources\\cross.bmp", 0);
+		iShowBMP2(500, 200, "cross.bmp", 0);
 	}
 	if (block1_3 == 1)
 	{
-		iShowBMP2(650, 200, "resources\\cross.bmp", 0);
+		iShowBMP2(650, 200, "cross.bmp", 0);
 	}
 	if (block1_4 == 1)
 	{
-		iShowBMP2(360, 350, "resources\\cross.bmp", 0);
+		iShowBMP2(360, 350, "cross.bmp", 0);
 	}
 	if (block1_5 == 1)
 	{
-		iShowBMP2(500, 350, "resources\\cross.bmp", 0);
+		iShowBMP2(500, 350, "cross.bmp", 0);
 	}
 	if (block1_6 == 1)
 	{
-		iShowBMP2(650, 350, "resources\\cross.bmp", 0);
+		iShowBMP2(650, 350, "cross.bmp", 0);
 	}
 	if (block1_7 == 1)
 	{
-		iShowBMP2(360, 490, "resources\\cross.bmp", 0);
+		iShowBMP2(360, 490, "cross.bmp", 0);
 	}
 	if (block1_8 == 1)
 	{
-		iShowBMP2(500, 490, "resources\\cross.bmp", 0);
+		iShowBMP2(500, 490, "cross.bmp", 0);
 	}
 	if (block1_9 == 1)
 	{
-		iShowBMP2(645, 485, "resources\\cross.bmp", 0);
+		iShowBMP2(645, 485, "cross.bmp", 0);
 	}
 }
 
 
 if(checkWin(board_2, 'x')){
 	    x_s_point += 1;
-		iShowBMP(340,680, "resources\\X_win.bmp");
-		iShowBMP(340,1064,"resources\\xwon.bmp");
+		iShowBMP(340,680, "X_win.bmp");
+		iShowBMP(340,1064,"xwon.bmp");
 		if(data2 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data2 = 0;
 		}
 	}
 		else if(!checkWin(board_2, 'o')){
 	if (block2_1 == 1)
 	{
-		iShowBMP2(360, 700, "resources\\cross.bmp", 0);
+		iShowBMP2(360, 700, "cross.bmp", 0);
 	}
 	if (block2_2 == 1)
 	{
-		iShowBMP2(500, 700, "resources\\cross.bmp", 0);
+		iShowBMP2(500, 700, "cross.bmp", 0);
 	}
 	if (block2_3 == 1)
 	{
-		iShowBMP2(650, 700, "resources\\cross.bmp", 0);
+		iShowBMP2(650, 700, "cross.bmp", 0);
 	}
 	if (block2_4 == 1)
 	{
-		iShowBMP2(360, 850, "resources\\cross.bmp", 0);
+		iShowBMP2(360, 850, "cross.bmp", 0);
 	}
 	if (block2_5 == 1)
 	{
-		iShowBMP2(500, 850, "resources\\cross.bmp", 0);
+		iShowBMP2(500, 850, "cross.bmp", 0);
 	}
 	if (block2_6 == 1)
 	{
-		iShowBMP2(650, 850, "resources\\cross.bmp", 0);
+		iShowBMP2(650, 850, "cross.bmp", 0);
 	}
 	if (block2_7 == 1)
 	{
-		iShowBMP2(360, 990, "resources\\cross.bmp", 0);
+		iShowBMP2(360, 990, "cross.bmp", 0);
 	}
 	if (block2_8 == 1)
 	{
-		iShowBMP2(500, 990, "resources\\cross.bmp", 0);
+		iShowBMP2(500, 990, "cross.bmp", 0);
 	}
 	if (block2_9 == 1)
 	{
-		iShowBMP2(650, 990, "resources\\cross.bmp", 0);
+		iShowBMP2(650, 990, "cross.bmp", 0);
 	}
 
 	}
@@ -449,96 +449,96 @@ if(checkWin(board_2, 'x')){
 
 	if(checkWin(board_3, 'x')){
 		x_s_point += 1;
-		iShowBMP(840,180, "resources\\X_win.bmp");
-		iShowBMP(840,564,"resources\\xwon.bmp");
+		iShowBMP(840,180, "X_win.bmp");
+		iShowBMP(840,564,"xwon.bmp");
 		if(data3 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data3 = 0;
 		}
 	}else if(!checkWin(board_3, 'o')){
 	if (block3_1 == 1)
 	{
-		iShowBMP2(860, 200, "resources\\cross.bmp", 0);
+		iShowBMP2(860, 200, "cross.bmp", 0);
 	}
 	if (block3_2 == 1)
 	{
-		iShowBMP2(1000, 200, "resources\\cross.bmp", 0);
+		iShowBMP2(1000, 200, "cross.bmp", 0);
 	}
 	if (block3_3 == 1)
 	{
-		iShowBMP2(1150, 200, "resources\\cross.bmp", 0);
+		iShowBMP2(1150, 200, "cross.bmp", 0);
 	}
 	if (block3_4 == 1)
 	{
-		iShowBMP2(860, 350, "resources\\cross.bmp", 0);
+		iShowBMP2(860, 350, "cross.bmp", 0);
 	}
 	if (block3_5 == 1)
 	{
-		iShowBMP2(1000, 350, "resources\\cross.bmp", 0);
+		iShowBMP2(1000, 350, "cross.bmp", 0);
 	}
 	if (block3_6 == 1)
 	{
-		iShowBMP2(1150, 350, "resources\\cross.bmp", 0);
+		iShowBMP2(1150, 350, "cross.bmp", 0);
 	}
 	if (block3_7 == 1)
 	{
-		iShowBMP2(860, 490, "resources\\cross.bmp", 0);
+		iShowBMP2(860, 490, "cross.bmp", 0);
 	}
 	if (block3_8 == 1)
 	{
-		iShowBMP2(1000, 490, "resources\\cross.bmp", 0);
+		iShowBMP2(1000, 490, "cross.bmp", 0);
 	}
 	if (block3_9 == 1)
 	{
-		iShowBMP2(1150, 490, "resources\\cross.bmp", 0);
+		iShowBMP2(1150, 490, "cross.bmp", 0);
 	}
 	}
 
 
 	if(checkWin(board_4, 'x')){
 		x_s_point += 1;
-		iShowBMP(840,680, "resources\\X_win.bmp");
-		iShowBMP(840,1063,"resources\\xwon.bmp");
+		iShowBMP(840,680, "X_win.bmp");
+		iShowBMP(840,1063,"xwon.bmp");
 		if(data4 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data4 = 0;
 		}
 	}else if(!checkWin(board_4, 'o')){
 	if (block4_1 == 1)
 	{
-		iShowBMP2(360 + 500, 200 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(360 + 500, 200 + 500, "cross.bmp", 0);
 	}
 	if (block4_2 == 1)
 	{
-		iShowBMP2(1000, 200 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(1000, 200 + 500, "cross.bmp", 0);
 	}
 	if (block4_3 == 1)
 	{
-		iShowBMP2(650 + 500, 200 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(650 + 500, 200 + 500, "cross.bmp", 0);
 	}
 	if (block4_4 == 1)
 	{
-		iShowBMP2(360 + 500, 350 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(360 + 500, 350 + 500, "cross.bmp", 0);
 	}
 	if (block4_5 == 1)
 	{
-		iShowBMP2(1000, 350 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(1000, 350 + 500, "cross.bmp", 0);
 	}
 	if (block4_6 == 1)
 	{
-		iShowBMP2(650 + 500, 350 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(650 + 500, 350 + 500, "cross.bmp", 0);
 	}
 	if (block4_7 == 1)
 	{
-		iShowBMP2(360 + 500, 490 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(360 + 500, 490 + 500, "cross.bmp", 0);
 	}
 	if (block4_8 == 1)
 	{
-		iShowBMP2(1000, 490 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(1000, 490 + 500, "cross.bmp", 0);
 	}
 	if (block4_9 == 1)
 	{
-		iShowBMP2(650 + 500, 490 + 500, "resources\\cross.bmp", 0);
+		iShowBMP2(650 + 500, 490 + 500, "cross.bmp", 0);
 	}
 	}
 
@@ -546,48 +546,48 @@ if(checkWin(board_2, 'x')){
 
 if(checkWin(board_1, 'o')){
 	   o_s_point += 1;
-		iShowBMP(340,180, "resources\\X_win.bmp");
-		iShowBMP(340,564,"resources\\owon.bmp");
+		iShowBMP(340,180, "X_win.bmp");
+		iShowBMP(340,564,"owon.bmp");
 		if(data5 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data5 = 0;
 		}
 	}else if(!checkWin(board_1, 'x')){
 	if (block1_1 == 2)
 	{
-		iShowBMP2(355, 195, "resources\\circle.bmp", 0);
+		iShowBMP2(355, 195, "circle.bmp", 0);
 	}
 	if (block1_2 == 2)
 	{
-		iShowBMP2(497, 195, "resources\\circle.bmp", 0);
+		iShowBMP2(497, 195, "circle.bmp", 0);
 	}
 	if (block1_3 == 2)
 	{
-		iShowBMP2(645, 195, "resources\\circle.bmp", 0);
+		iShowBMP2(645, 195, "circle.bmp", 0);
 	}
 	if (block1_4 == 2)
 	{
-		iShowBMP2(355, 338, "resources\\circle.bmp", 0);
+		iShowBMP2(355, 338, "circle.bmp", 0);
 	}
 	if (block1_5 == 2)
 	{
-		iShowBMP2(497, 338, "resources\\circle.bmp", 0);
+		iShowBMP2(497, 338, "circle.bmp", 0);
 	}
 	if (block1_6 == 2)
 	{
-		iShowBMP2(645, 338, "resources\\circle.bmp", 0);
+		iShowBMP2(645, 338, "circle.bmp", 0);
 	}
 	if (block1_7 == 2)
 	{
-		iShowBMP2(355, 485, "resources\\circle.bmp", 0);
+		iShowBMP2(355, 485, "circle.bmp", 0);
 	}
 	if (block1_8 == 2)
 	{
-		iShowBMP2(497, 485, "resources\\circle.bmp", 0);
+		iShowBMP2(497, 485, "circle.bmp", 0);
 	}
 	if (block1_9 == 2)
 	{
-		iShowBMP2(645, 485, "resources\\circle.bmp", 0);
+		iShowBMP2(645, 485, "circle.bmp", 0);
 	}
 	}
 
@@ -595,48 +595,48 @@ if(checkWin(board_1, 'o')){
 
 	if(checkWin(board_2, 'o')){
 		o_s_point += 1;
-		iShowBMP(340,680, "resources\\X_win.bmp");
-		iShowBMP(340,1064,"resources\\owon.bmp");
+		iShowBMP(340,680, "X_win.bmp");
+		iShowBMP(340,1064,"owon.bmp");
 		if(data6 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data6 = 0;
 		}
 	}else if(!checkWin(board_2, 'x')){
 	if (block2_1 == 2)
 	{
-		iShowBMP2(355, 195 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(355, 195 + 500, "circle.bmp", 0);
 	}
 	if (block2_2 == 2)
 	{
-		iShowBMP2(497, 195 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(497, 195 + 500, "circle.bmp", 0);
 	}
 	if (block2_3 == 2)
 	{
-		iShowBMP2(645, 195 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(645, 195 + 500, "circle.bmp", 0);
 	}
 	if (block2_4 == 2)
 	{
-		iShowBMP2(355, 340 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(355, 340 + 500, "circle.bmp", 0);
 	}
 	if (block2_5 == 2)
 	{
-		iShowBMP2(497, 340 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(497, 340 + 500, "circle.bmp", 0);
 	}
 	if (block2_6 == 2)
 	{
-		iShowBMP2(645, 340 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(645, 340 + 500, "circle.bmp", 0);
 	}
 	if (block2_7 == 2)
 	{
-		iShowBMP2(355, 485 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(355, 485 + 500, "circle.bmp", 0);
 	}
 	if (block2_8 == 2)
 	{
-		iShowBMP2(497, 485 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(497, 485 + 500, "circle.bmp", 0);
 	}
 	if (block2_9 == 2)
 	{
-		iShowBMP2(645, 485 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(645, 485 + 500, "circle.bmp", 0);
 	}
   }
 
@@ -644,48 +644,48 @@ if(checkWin(board_1, 'o')){
 
   if(checkWin(board_3, 'o')){
 	    o_s_point += 1;
-		iShowBMP(840,180, "resources\\X_win.bmp");
-		iShowBMP(840,564,"resources\\owon.bmp");
+		iShowBMP(840,180, "X_win.bmp");
+		iShowBMP(840,564,"owon.bmp");
 		if(data7 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data7 = 0;
 		}
 	}else if(!checkWin(board_3, 'x')){
 	if (block3_1 == 2)
 	{
-		iShowBMP2(355 + 500, 195, "resources\\circle.bmp", 0);
+		iShowBMP2(355 + 500, 195, "circle.bmp", 0);
 	}
 	if (block3_2 == 2)
 	{
-		iShowBMP2(497 + 500, 195, "resources\\circle.bmp", 0);
+		iShowBMP2(497 + 500, 195, "circle.bmp", 0);
 	}
 	if (block3_3 == 2)
 	{
-		iShowBMP2(645 + 500, 195, "resources\\circle.bmp", 0);
+		iShowBMP2(645 + 500, 195, "circle.bmp", 0);
 	}
 	if (block3_4 == 2)
 	{
-		iShowBMP2(355 + 500, 340, "resources\\circle.bmp", 0);
+		iShowBMP2(355 + 500, 340, "circle.bmp", 0);
 	}
 	if (block3_5 == 2)
 	{
-		iShowBMP2(497 + 500, 340, "resources\\circle.bmp", 0);
+		iShowBMP2(497 + 500, 340, "circle.bmp", 0);
 	}
 	if (block3_6 == 2)
 	{
-		iShowBMP2(645 + 500, 340, "resources\\circle.bmp", 0);
+		iShowBMP2(645 + 500, 340, "circle.bmp", 0);
 	}
 	if (block3_7 == 2)
 	{
-		iShowBMP2(355 + 500, 485, "resources\\circle.bmp", 0);
+		iShowBMP2(355 + 500, 485, "circle.bmp", 0);
 	}
 	if (block3_8 == 2)
 	{
-		iShowBMP2(497 + 500, 485, "resources\\circle.bmp", 0);
+		iShowBMP2(497 + 500, 485, "circle.bmp", 0);
 	}
 	if (block3_9 == 2)
 	{
-		iShowBMP2(645 + 500, 485, "resources\\circle.bmp", 0);
+		iShowBMP2(645 + 500, 485, "circle.bmp", 0);
 	}
 	}
 
@@ -693,88 +693,88 @@ if(checkWin(board_1, 'o')){
 
 	if(checkWin(board_4, 'o')){
 		o_s_point += 1;
-		iShowBMP(840,680, "resources\\X_win.bmp");
-		iShowBMP(840,1063,"resources\\owon.bmp");
+		iShowBMP(840,680, "X_win.bmp");
+		iShowBMP(840,1063,"owon.bmp");
 		if(data8 == 1){
-		PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
+		PlaySound("win_m.wav", NULL, SND_ASYNC);
 		data8 = 0;
 		}
 	}else if(!checkWin(board_4, 'x')){
 	if (block4_1 == 2)
 	{
-		iShowBMP2(355 + 500, 195 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(355 + 500, 195 + 500, "circle.bmp", 0);
 	}
 	if (block4_2 == 2)
 	{
-		iShowBMP2(497 + 500, 195 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(497 + 500, 195 + 500, "circle.bmp", 0);
 	}
 	if (block4_3 == 2)
 	{
-		iShowBMP2(645 + 500, 195 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(645 + 500, 195 + 500, "circle.bmp", 0);
 	}
 	if (block4_4 == 2)
 	{
-		iShowBMP2(355 + 500, 340 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(355 + 500, 340 + 500, "circle.bmp", 0);
 	}
 	if (block4_5 == 2)
 	{
-		iShowBMP2(497 + 500, 340 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(497 + 500, 340 + 500, "circle.bmp", 0);
 	}
 	if (block4_6 == 2)
 	{
-		iShowBMP2(645 + 500, 340 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(645 + 500, 340 + 500, "circle.bmp", 0);
 	}
 	if (block4_7 == 2)
 	{
-		iShowBMP2(355 + 500, 485 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(355 + 500, 485 + 500, "circle.bmp", 0);
 	}
 	if (block4_8 == 2)
 	{
-		iShowBMP2(497 + 500, 485 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(497 + 500, 485 + 500, "circle.bmp", 0);
 	}
 	if (block4_9 == 2)
 	{
-		iShowBMP2(645 + 500, 485 + 500, "resources\\circle.bmp", 0);
+		iShowBMP2(645 + 500, 485 + 500, "circle.bmp", 0);
 	}
 	}
 	if(current == 1){
-		iShowBMP(730, 620, "resources\\x'sturn.bmp");
+		iShowBMP(730, 620, "x'sturn.bmp");
 	}else if(current == 2){
-		iShowBMP(730, 620, "resources\\o'sturn.bmp");
+		iShowBMP(730, 620, "o'sturn.bmp");
 	}
 
 	if(checkDraw(board_1)){
-		iShowBMP(340,564,"resources\\draw.bmp");
-		iShowBMP(340,180, "resources\\X_win.bmp");
+		iShowBMP(340,564,"draw.bmp");
+		iShowBMP(340,180, "X_win.bmp");
 		if(dat1 == 1){
-		PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
+		PlaySound("tie.wav", NULL, SND_ASYNC);
 		dat1 = 0;
 		}
 		}
 
 		if(checkDraw(board_2)){
-		iShowBMP(340,1064,"resources\\draw.bmp");
-		iShowBMP(340,680, "resources\\X_win.bmp");
+		iShowBMP(340,1064,"draw.bmp");
+		iShowBMP(340,680, "X_win.bmp");
 		if(dat2 == 1){
-		PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
+		PlaySound("tie.wav", NULL, SND_ASYNC);
 		dat2 = 0;
 		
 		}
 		}
 
 		 if(checkDraw(board_3)){
-		iShowBMP(840,564,"resources\\draw.bmp");
-		iShowBMP(840,180, "resources\\X_win.bmp");
+		iShowBMP(840,564,"draw.bmp");
+		iShowBMP(840,180, "X_win.bmp");
 		if(dat3 == 1){
-		PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
+		PlaySound("tie.wav", NULL, SND_ASYNC);
 		dat3 = 0;
 		}
 		}
 		 if(checkDraw(board_4)){
-		iShowBMP(840,1063,"resources\\draw.bmp");
-		iShowBMP(840,680, "resources\\X_win.bmp");
+		iShowBMP(840,1063,"draw.bmp");
+		iShowBMP(840,680, "X_win.bmp");
 		if(dat4 == 1){
-		PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
+		PlaySound("tie.wav", NULL, SND_ASYNC);
 		dat4 = 0;
 		}
 		}
@@ -799,7 +799,7 @@ void iMouse(int button, int state, int mx, int my)
 	else{
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		PlaySound("resources\\move.wav", NULL, SND_ASYNC);
+		PlaySound("move.wav", NULL, SND_ASYNC);
 		if (current == 1)
 		
 
