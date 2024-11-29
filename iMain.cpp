@@ -106,6 +106,27 @@ char board_4[size][size] = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 char symbol_1 = 'x';
 char symbol_2 = 'o';
 
+
+
+void playmusic(){
+	if(current == 0){
+		PlaySound("home.wav", NULL, SND_LOOP | SND_ASYNC);
+	}
+}
+void nevigate(int button, int state, int mx, int my){
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		PlaySound("move.wav", NULL, SND_ASYNC);
+		if(mx >= 601 && mx <= 991 && my >= 259 && my <= 310){
+			exit(0);
+		}
+		if(mx >= 601 && mx <= 991 && my >= 345 && my <= 399){
+			current = 3;
+		}
+		if(mx >= 601 && mx <= 991 && my >= 430 && my <= 485){
+			current = 1;
+		}
+	}
+}
 // int done = 0;
 
 //--------------------------------------------------------------AI part-----------------------------------------------------------------------------------------
@@ -313,6 +334,10 @@ void iDraw()
 
 
 	iClear();
+	if(current == 0){
+	iShowBMP(0, 0, "Game_homepage.bmp");
+	}
+	if(current > 0){
 	iShowBMP(0, 0, "project_bg.bmp");
 	iShowBMP(300, 140, "tic_tac_game-crop (2).bmp");
 	iShowBMP(300, 642, "tic_tac_game-crop (2).bmp");
@@ -753,6 +778,7 @@ if(checkWin(board_1, 'o')){
 		dat4 = 0;
 		}
 		}
+		}
 }
 
 void iMouseMove(int mx, int my)
@@ -767,11 +793,13 @@ void iMouseMove(int mx, int my)
 	*/
 void iMouse(int button, int state, int mx, int my)
 {
-
+	if(current == 0){
+	nevigate(button, state, mx, my);
+	}
+	else{
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
 		PlaySound("move.wav", NULL, SND_ASYNC);
-
 		if (current == 1)
 		
 
@@ -1796,6 +1824,7 @@ void iMouse(int button, int state, int mx, int my)
 			exit(0);
 		}
 	}
+	}
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
 		// place your codes here
@@ -1840,11 +1869,11 @@ int main()
 
 	//  iSetTimer(4200, toss);
 
-	current = 3;
+	current = 0;
 	
 	//    feature();
-
+	playmusic();
 	iInitialize(1600, 1140, "Tic-Tac-Toe");
-
+	
 	return 0;
 }
