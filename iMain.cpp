@@ -1867,7 +1867,6 @@ int main()
 
 	//    PlaySound("home.wav", NULL, SND_LOOP | SND_ASYNC);
 
-	//  iSetTimer(4200, toss);
 
 	current = 0;
 	
