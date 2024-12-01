@@ -93,6 +93,9 @@ int block4_9 = 0;
 
 int bst_row1, bst_col1;
 
+int easy = 0;
+int medium = 0;
+int hard = 0;
 
 static int player_at1 = 0;
 static int player_at2 = 0;
@@ -127,145 +130,143 @@ void nevigate(int button, int state, int mx, int my){
 		}
 	}
 }
+
+
+
+void Ai_mode(int current,int button, int state, int mx, int my){
+	if(current == 3 && easy == 0 && medium == 0 && hard == 0){
+	 if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		if(mx >= 673 && mx <= 926 && my >= 729 && my <= 826){
+			easy = 1;
+		}else if(mx >= 673 && mx <= 926 && my >= 598 && my <= 693){
+			medium = 1;
+		}else if(mx >= 673 && mx <= 926 && my >= 475 && my <= 564){
+			hard = 1;
+		}
+	 }
+	}
+}
 // int done = 0;
 
 //--------------------------------------------------------------AI part-----------------------------------------------------------------------------------------
 
 
+// ----------------------------------------------------------------------Medium----------------------------------------------------------------
 
+
+
+
+
+
+// ________________________________________________________________________Hard_______________________________________________________________________
 typedef struct {
     int row, col;
 } Move;
 
 bool isMovesLeft(char board[3][3]) {
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            if (board[i][j] == ' ')
-                return true;
-    return false;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+if (board[i][j] == ' ') 
+{
+	return true;
+	}
+        }
+    }
+return false;
 }
 
-int evaluate(char b[3][3]) {
-
-    for (int row = 0; row < 3; row++) {
-        if (b[row][0] == b[row][1] && b[row][1] == b[row][2]) {
-            if (b[row][0] == player)
-                return +10;
-            else if (b[row][0] == opponent)
-                return -10;
+int evaluate(char board[3][3]) {
+    
+    for (int i = 0; i < 3; i++) {
+    if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+    if (board[i][0] == 'x') return 10;
+    else if (board[i][0] == 'o') return -10;
+        }
+    }
+    for (int j = 0; j < 3; j++) {
+     if (board[0][j] == board[1][j] && board[1][j] == board[2][j]) {
+        if (board[0][j] == 'x') return 10;
+    else if (board[0][j] == 'o') return -10;
         }
     }
 
-    for (int col = 0; col < 3; col++) {
-        if (b[0][col] == b[1][col] && b[1][col] == b[2][col]) {
-            if (b[0][col] == player)
-                return +10;
-            else if (b[0][col] == opponent)
-                return -10;
-        }
+    if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+        if (board[0][0] == 'x') return 10;
+        else if (board[0][0] == 'o') return -10;
     }
 
-    if (b[0][0] == b[1][1] && b[1][1] == b[2][2]) {
-        if (b[0][0] == player)
-            return +10;
-        else if (b[0][0] == opponent)
-            return -10;
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+        if (board[0][2] == 'x') return 10;
+        else if (board[0][2] == 'o') return -10;
     }
 
-    if (b[0][2] == b[1][1] && b[1][1] == b[2][0]) {
-        if (b[0][2] == player)
-            return +10;
-        else if (b[0][2] == opponent)
-            return -10;
-    }
-
-    return 0; 
+    return 0;
 }
 
 int minimax(char board[3][3], int depth, bool isMax) {
     int score = evaluate(board);
 
-    if (score == 10)
-        return score;
+    if (score == 10) 
+	{
+		return (score - depth);
+	}
 
-    if (score == -10)
-        return score;
+    if (score == -10) 
+	{
+		return (score + depth);
+	}
 
-    if (!isMovesLeft(board))
-        return 0;
+    if (!isMovesLeft(board)) return 0;
 
     if (isMax) {
-        int best = -1000;
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-              
-                if (board[i][j] == ' ') {
-                   
-                    board[i][j] = player;
-
-                    best = (best < minimax(board, depth + 1, false)) ? minimax(board, depth + 1, false) : best;
-
+        int best = INT_MIN;
+    for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+    if (board[i][j] == ' ') {
+    board[i][j] = 'x';
+    best = (best < minimax(board, depth + 1, false)) ? minimax(board, depth + 1, false) : best;
                     board[i][j] = ' ';
                 }
             }
         }
         return best;
-    } 
- 
-    else {
-        int best = 1000;
-
+    } else {
+        int best = INT_MAX;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-               
                 if (board[i][j] == ' ') {
-                    
-                    board[i][j] = opponent;
-
-                    best = (best > minimax(board, depth + 1, true)) ? minimax(board, depth + 1, true) : best;
-
+                    board[i][j] = 'o';
+                    best = (best > minimax(board, depth + 1, false)) ? minimax(board, depth + 1, false) : best;
                     board[i][j] = ' ';
                 }
             }
         }
-		return best; 
-	} 
-} 
+        return best;
+    }
+}
 
+Move findBestMove(char board[3][3]) {
+    int best_value = INT_MIN;
+    Move bestMove = {-1, -1};
 
-Move findBestMove(char board[3][3]) 
-{ 
-	int bestVal = -1000; 
-	Move bestMove; 
-	bestMove.row = -1; 
-	bestMove.col = -1; 
-	for (int i = 0; i<3; i++) 
-	{ 
-		for (int j = 0; j<3; j++) 
-		{ 
-		
-			if (board[i][j]==' ') 
-			{ 
-				
-				board[i][j] = player; 
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] == ' ') {
+                board[i][j] = 'x';
+                int move_cost = minimax(board, 0, false);
+                board[i][j] = ' ';
 
-			
-				int moveVal = minimax(board, 0, false); 
+                if (move_cost > best_value) {
+                    bestMove.row = i;
+                    bestMove.col = j;
+                    best_value = move_cost;
+                }
+            }
+        }
+    }
 
-				board[i][j] = ' '; 
-				if (moveVal > bestVal) 
-				{ 
-					bestMove.row = i; 
-					bestMove.col = j; 
-					bestVal = moveVal; 
-				} 
-			} 
-		} 
-	}  
-
-	return bestMove; 
-} 
+    return bestMove;
+}
 
 
 // ---------------------------------------win cndition part-----------------------------------------------------------
@@ -336,14 +337,16 @@ void iDraw()
 	iClear();
 	if(current == 0){
 	iShowBMP(0, 0, "Game_homepage.bmp");
+	}else if(current == 3 &&  easy == 0 && medium == 0 && hard == 0){
+		iShowBMP(0, 0, "Game_homepage-blur.bmp");
+		 iShowBMP(510, 300, "AI_mode.bmp");
 	}
-	if(current > 0){
+	else if(current > 0){
 	iShowBMP(0, 0, "project_bg.bmp");
 	iShowBMP(300, 140, "tic_tac_game-crop (2).bmp");
 	iShowBMP(300, 642, "tic_tac_game-crop (2).bmp");
 	iShowBMP(800, 140, "tic_tac_game-crop (2).bmp");
 	iShowBMP(800, 642, "tic_tac_game-crop (2).bmp");
-	
 	
 	if(checkWin(board_1, 'x')){
 		x_s_point += 1;
@@ -795,6 +798,10 @@ void iMouse(int button, int state, int mx, int my)
 {
 	if(current == 0){
 	nevigate(button, state, mx, my);
+	}else if (current == 3 && easy == 0 && medium == 0 && hard == 0)
+	{
+		PlaySound("move.wav", NULL, SND_ASYNC);
+		Ai_mode(current, button, state, mx, my);
 	}
 	else{
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -1667,6 +1674,189 @@ void iMouse(int button, int state, int mx, int my)
 
 		if(current == 4)
 			{
+				if(easy == 1){
+					if(!checkWin(board_1, symbol_1) && player_at1 == 1)
+			     {
+				player_at1 = 0;
+				current = value_altr(current);
+					int row_1 = -1;
+                    int col_1 = -1;
+					for(int i = 0; i < 3 && row_1 == -1; i++){
+						for(int j = 0; j < 3; j++){
+							if(board_1[i][j] == ' '){
+								board_1[i][j] = 'x';
+								row_1 = i;
+								col_1 = j;
+								break;
+							}
+						}
+					}
+					if(row_1 == 0 && col_1 == 0){
+						block1_1 = 1;
+					}else if(row_1 == 0 && col_1 == 1){
+						block1_2 = 1;
+					}else if(row_1 == 0 && col_1 == 2){
+						block1_3 = 1;
+					}else if(row_1 == 1 && col_1 == 0){
+						block1_4 = 1;
+					}else if(row_1 == 1 && col_1 == 1){
+						block1_5 = 1;
+
+					}else if(row_1 == 1 && col_1 == 2){
+						block1_6 = 1;
+					}else if(row_1 == 2 && col_1 == 0){
+						block1_7 = 1;
+					}else if(row_1 == 2 && col_1 == 1){
+						block1_8 = 1;
+					}else if(row_1 == 2 && col_1 == 2){
+						block1_9 = 1;
+					}
+					}
+
+			 if(!checkWin(board_2, symbol_1) && player_at2 == 1){
+				done = 0;
+				player_at2 = 0;
+				current = value_altr(current);
+				int row = -1;
+                    int col = -1;
+					for(int i = 0; i < 3 && row == -1; i++){
+						for(int j = 0; j < 3; j++){
+							if(board_2[i][j] == ' '){
+								board_2[i][j] = 'x';
+								row = i;
+								col = j;
+								break;
+							}
+						}
+					}
+					if(row == 0 && col == 0){
+						block2_1 = 1;
+						
+					}else if(row == 0 && col == 1){
+						block2_2 = 1;
+					
+					}else if(row == 0 && col == 2){
+						block2_3 = 1;
+						
+					}else if(row == 1 && col == 0){
+						block2_4 = 1;
+					
+					}else if(row == 1 && col == 1){
+						block2_5 = 1;
+						
+					}else if(row == 1 && col == 2){
+						block2_6 = 1;
+						
+					}else if(row == 2 && col == 0){
+						block2_7 = 1;
+					
+					}else if(row == 2 && col == 1){
+						block2_8 = 1;
+						
+					}else if(row == 2 && col == 2){
+						block2_9 = 1;
+						
+					}
+					}
+			
+
+
+		   if(!checkWin(board_3, symbol_1) && player_at3 == 1){
+			done = 0;
+			player_at3 = 0;
+			current = value_altr(current);
+			        int row = -1;
+                    int col = -1;
+					for(int i = 0; i < 3 && row == -1; i++){
+						for(int j = 0; j < 3; j++){
+							if(board_3[i][j] == ' '){
+								board_3[i][j] = 'x';
+								row = i;
+								col = j;
+								break;
+							}
+						}
+					}
+					if(row == 0 && col == 0){
+						block3_1 = 1;
+						
+					}else if(row == 0 && col == 1){
+						block3_2 = 1;
+						
+					}else if(row == 0 && col == 2){
+						block3_3 = 1;
+						
+					}else if(row == 1 && col == 0){
+						block3_4 = 1;
+						
+					}else if(row == 1 && col == 1){
+						block3_5 = 1;
+						
+					}else if(row == 1 && col == 2){
+						block3_6 = 1;
+						
+					}else if(row == 2 && col == 0){
+						block3_7 = 1;
+						
+					}else if(row == 2 && col == 1){
+						block3_8 = 1;
+						
+					}else if(row == 2 && col == 2){
+						block3_9 = 1;
+						
+					}
+					}
+
+
+			  if(!checkWin(board_4, symbol_1) && player_at4 == 1){
+				done = 0;
+				player_at4 = 0;
+				current = value_altr(current);
+				int row = -1;
+                    int col = -1;
+					for(int i = 0; i < 3 && row == -1; i++){
+						for(int j = 0; j < 3; j++){
+							if(board_4[i][j] == ' '){
+								board_4[i][j] = 'x';
+								row = i;
+								col = j;
+								break;
+							}
+						}
+					}
+					if(row == 0 && col == 0){
+						block4_1 = 1;
+						
+					}else if(row == 0 && col == 1){
+						block4_2 = 1;
+						
+					}else if(row == 0 && col == 2){
+						block4_3 = 1;
+						
+					}else if(row == 1 && col == 0){
+						block4_4 = 1;
+						
+					}else if(row == 1 && col == 1){
+						block4_5 = 1;
+						
+					}else if(row == 1 && col == 2){
+						block4_6 = 1;
+						
+					}else if(row == 2 && col == 0){
+						block4_7 = 1;
+						
+					}else if(row == 2 && col == 1){
+						block4_8 = 1;
+						
+					}else if(row == 2 && col == 2){
+						block4_9 = 1;
+						
+					}
+					}
+					current = 3;	
+		}
+		else if(medium == 1){
+				
 				 if(!checkWin(board_1, symbol_1) && player_at1 == 1)
 			     {
 				done = 0;
@@ -1815,6 +2005,157 @@ void iMouse(int button, int state, int mx, int my)
 		current = 3;
 			
 		}
+		else if(hard == 1){
+			if(!checkWin(board_1, symbol_1) && player_at1 == 1)
+			     {
+				done = 0;
+				player_at1 = 0;
+				current = value_altr(current);
+					Move bestMove = findBestMove(board_1);
+					if(bestMove.row == 0 && bestMove.col == 0){
+						block1_1 = 1;
+						board_1[0][0] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 1){
+						block1_2 = 1;
+						board_1[0][1] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 2){
+						block1_3 = 1;
+						board_1[0][2] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 0){
+						block1_4 = 1;
+						board_1[1][0] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 1){
+						block1_5 = 1;
+						board_1[1][1] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 2){
+						block1_6 = 1;
+						board_1[1][2] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 0){
+						block1_7 = 1;
+						board_1[2][0] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 1){
+						block1_8 = 1;
+						board_1[2][1] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 2){
+						block1_9 = 1;
+						board_1[2][2] = 'x';
+					}		
+			}
+
+			 if(!checkWin(board_2, symbol_1) && player_at2 == 1){
+				done = 0;
+				player_at2 = 0;
+				current = value_altr(current);
+				Move bestMove = findBestMove(board_2);
+					
+					if(bestMove.row == 0 && bestMove.col == 0){
+						block2_1 = 1;
+						board_2[0][0] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 1){
+						block2_2 = 1;
+						board_2[0][1] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 2){
+						block2_3 = 1;
+						board_2[0][2] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 0){
+						block2_4 = 1;
+						board_2[1][0] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 1){
+						block2_5 = 1;
+						board_2[1][1] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 2){
+						block2_6 = 1;
+						board_2[1][2] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 0){
+						block2_7 = 1;
+						board_2[2][0] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 1){
+						block2_8 = 1;
+						board_2[2][1] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 2){
+						block2_9 = 1;
+						board_2[2][2] = 'x';
+					}
+			
+          }
+
+
+		   if(!checkWin(board_3, symbol_1) && player_at3 == 1){
+			done = 0;
+			player_at3 = 0;
+			current = value_altr(current);
+			Move bestMove = findBestMove(board_3);
+					if(bestMove.row == 0 && bestMove.col == 0){
+						block3_1 = 1;
+						board_3[0][0] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 1){
+						block3_2 = 1;
+						board_3[0][1] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 2){
+						block3_3 = 1;
+						board_3[0][2] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 0){
+						block3_4 = 1;
+						board_3[1][0] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 1){
+						block3_5 = 1;
+						board_3[1][1] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 2){
+						block3_6 = 1;
+						board_3[1][2] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 0){
+						block3_7 = 1;
+						board_3[2][0] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 1){
+						block3_8 = 1;
+						board_3[2][1] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 2){
+						block3_9 = 1;
+						board_3[2][2] = 'x';
+					}
+             }
+
+
+			  if(!checkWin(board_4, symbol_1) && player_at4 == 1){
+				done = 0;
+				player_at4 = 0;
+				current = value_altr(current);
+				Move bestMove = findBestMove(board_4);
+					if(bestMove.row == 0 && bestMove.col == 0){
+						block4_1 = 1;
+						board_4[0][0] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 1){
+						block4_2 = 1;
+						board_4[0][1] = 'x';
+					}else if(bestMove.row == 0 && bestMove.col == 2){
+						block4_3 = 1;
+						board_4[0][2] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 0){
+						block4_4 = 1;
+						board_4[1][0] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 1){
+						block4_5 = 1;
+						board_4[1][1] = 'x';
+					}else if(bestMove.row == 1 && bestMove.col == 2){
+						block4_6 = 1;
+						board_4[1][2] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 0){
+						block4_7 = 1;
+						board_4[2][0] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 1){
+						block4_8 = 1;
+						board_4[2][1] = 'x';
+					}else if(bestMove.row == 2 && bestMove.col == 2){
+						block4_9 = 1;
+						board_4[2][2] = 'x';
+					}
+					
+		}
+		current = 3;
+			
+		}
+		}
+		}
 		
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -1830,7 +2171,6 @@ void iMouse(int button, int state, int mx, int my)
 		// place your codes here
 		printf("%d %d\n", mx, my);
 	}
-}
 }
 /*
 	function iKeyboard() is called whenever the user hits a key in keyboard.
