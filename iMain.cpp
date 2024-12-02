@@ -161,13 +161,11 @@ void Ai_mode(int current, int button, int state, int mx, int my)
 
 // ----------------------------------------------------------------------Medium----------------------------------------------------------------
 
-// ________________________________________________________________________Hard_______________________________________________________________________
-typedef struct
-{
-	int row, col;
-} Move;
+typedef struct {
+    int row, col;
+} Move_in_medium;
 
-bool isMovesLeft(char board[3][3])
+int check_available_moves_mid(char board[3][3])
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -175,14 +173,158 @@ bool isMovesLeft(char board[3][3])
 		{
 			if (board[i][j] == ' ')
 			{
-				return true;
+				return 1;
 			}
 		}
 	}
-	return false;
+	return 0;
 }
 
-int evaluate(char board[3][3])
+int evalute_the_board_mid(char board[3][3]) {
+
+    for (int i = 0; i < 3; i++) {
+        if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+            if (board[i][0] == 'x')
+                return +10;
+            else if (board[i][0] == 'o')
+                return 0;
+        }
+    }
+
+    for (int j = 0; j < 3; j++) {
+        if (board[0][j] == board[1][j] && board[1][j] == board[2][j]) {
+            if (board[0][j] == 'x')
+                return +10;
+            else if (board[0][j] == 'o')
+                return 0;
+        }
+    }
+
+    if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+        if (board[0][0] == 'x')
+            return +10;
+        else if (board[0][0] == 'o')
+            return 0;
+    }
+
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+        if (board[0][2] == 'x')
+            return +10;
+        else if (board[0][2] == 'o')
+            return 0;
+    }
+
+    return 0; 
+}
+
+int medium_diff(char board[3][3], int depth, int is_max) {
+    int score = evalute_the_board_mid(board);
+
+    if (score == 10)
+        return score;
+
+    if (score == 0)
+        return score;
+
+    if (!check_available_moves_mid(board))
+        return 0;
+
+    if (is_max) {
+        int best = -1000;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+              
+                if (board[i][j] == ' ') {
+                   
+                    board[i][j] = 'x';
+
+                    best = (best < medium_diff(board, depth + 1, 0)) ? medium_diff(board, depth + 1, 0) : best;
+
+                    board[i][j] = ' ';
+                }
+            }
+        }
+        return best;
+    } 
+ 
+    else {
+        int best = 1000;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+               
+                if (board[i][j] == ' ') {
+                    
+                    board[i][j] = 'o';
+
+                    best = (best > medium_diff(board, depth + 1, 1)) ? medium_diff(board, depth + 1, 1) : best;
+
+                    board[i][j] = ' ';
+                }
+            }
+        }
+		return best; 
+	} 
+} 
+
+
+Move_in_medium find_medium_Move(char board[3][3]) 
+{ 
+	int bestVal = -1000; 
+	Move_in_medium optimal_move; 
+	optimal_move.row = -1; 
+	optimal_move.col = -1; 
+	for (int i = 0; i<3; i++) 
+	{ 
+		for (int j = 0; j<3; j++) 
+		{ 
+		
+			if (board[i][j]==' ') 
+			{ 
+				
+				board[i][j] = 'x'; 
+
+			
+				int moveVal = medium_diff(board, 0, 0); 
+
+				board[i][j] = ' '; 
+				if (moveVal > bestVal) 
+				{ 
+					optimal_move.row = i; 
+					optimal_move.col = j; 
+					bestVal = moveVal; 
+				} 
+			} 
+		} 
+	}  
+
+	return optimal_move; 
+} 
+
+
+// ________________________________________________________________________Hard_______________________________________________________________________
+typedef struct
+{
+	int row, col;
+} Move;
+
+int check_available_moves(char board[3][3])
+{
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (board[i][j] == ' ')
+			{
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int evalute_the_board(char board[3][3])
 {
 
 	for (int i = 0; i < 3; i++)
@@ -225,9 +367,9 @@ int evaluate(char board[3][3])
 	return 0;
 }
 
-int minimax(char board[3][3], int depth, bool isMax)
+int minimax(char board[3][3], int depth, int is_max)
 {
-	int score = evaluate(board);
+	int score = evalute_the_board(board);
 
 	if (score == 10)
 	{
@@ -239,10 +381,10 @@ int minimax(char board[3][3], int depth, bool isMax)
 		return (score + depth);
 	}
 
-	if (!isMovesLeft(board))
+	if (!check_available_moves(board))
 		return 0;
 
-	if (isMax)
+	if (is_max)
 	{
 		int best = INT_MIN;
 		for (int i = 0; i < 3; i++)
@@ -252,7 +394,7 @@ int minimax(char board[3][3], int depth, bool isMax)
 				if (board[i][j] == ' ')
 				{
 					board[i][j] = 'x';
-					best = (best < minimax(board, depth + 1, false)) ? minimax(board, depth + 1, false) : best;
+					best = (best < minimax(board, depth + 1, 0)) ? minimax(board, depth + 1, 0) : best;
 					board[i][j] = ' ';
 				}
 			}
@@ -269,7 +411,7 @@ int minimax(char board[3][3], int depth, bool isMax)
 				if (board[i][j] == ' ')
 				{
 					board[i][j] = 'o';
-					best = (best > minimax(board, depth + 1, false)) ? minimax(board, depth + 1, false) : best;
+					best = (best > minimax(board, depth + 1, 0)) ? minimax(board, depth + 1, 0) : best;
 					board[i][j] = ' ';
 				}
 			}
@@ -278,10 +420,10 @@ int minimax(char board[3][3], int depth, bool isMax)
 	}
 }
 
-Move findBestMove(char board[3][3])
+Move find_the_most_optimal_move(char board[3][3])
 {
 	int best_value = INT_MIN;
-	Move bestMove = {-1, -1};
+	Move optimal_move = {-1, -1};
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -290,20 +432,20 @@ Move findBestMove(char board[3][3])
 			if (board[i][j] == ' ')
 			{
 				board[i][j] = 'x';
-				int move_cost = minimax(board, 0, false);
+				int move_cost = minimax(board, 0, 0);
 				board[i][j] = ' ';
 
 				if (move_cost > best_value)
 				{
-					bestMove.row = i;
-					bestMove.col = j;
+					optimal_move.row = i;
+					optimal_move.col = j;
 					best_value = move_cost;
 				}
 			}
 		}
 	}
 
-	return bestMove;
+	return optimal_move;
 }
 
 // ---------------------------------------win cndition part-----------------------------------------------------------
@@ -448,8 +590,9 @@ void iDraw()
 		if (checkWin(board_2, 'x'))
 		{
 			x_s_point += 1;
-			iShowBMP(238, 430, "X_win.bmp");
 			iShowBMP(238, 740, "xwon.bmp");
+			iShowBMP(238, 430, "X_win.bmp");
+			
 			if (data2 == 1)
 			{
 				PlaySound("win_m.wav", NULL, SND_ASYNC);
@@ -809,7 +952,7 @@ void iDraw()
 		{
 			iShowBMP(514, 383, "o'sturn.bmp");
 		}
-
+		if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o')){
 		if (checkDraw(board_1))
 		{
 			iShowBMP(239, 350, "draw.bmp");
@@ -820,7 +963,9 @@ void iDraw()
 				dat1 = 0;
 			}
 		}
+		}
 
+		if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o')){
 		if (checkDraw(board_2))
 		{
 			iShowBMP(239, 740, "draw.bmp");
@@ -831,7 +976,9 @@ void iDraw()
 				dat2 = 0;
 			}
 		}
+		}
 
+		if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o')){
 		if (checkDraw(board_3))
 		{
 			iShowBMP(625, 350, "draw.bmp");
@@ -842,6 +989,9 @@ void iDraw()
 				dat3 = 0;
 			}
 		}
+		}
+
+		if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o')){
 		if (checkDraw(board_4))
 		{
 			iShowBMP(625, 740, "draw.bmp");
@@ -851,6 +1001,7 @@ void iDraw()
 				PlaySound("tie.wav", NULL, SND_ASYNC);
 				dat4 = 0;
 			}
+		}
 		}
 	}
 }
@@ -2000,48 +2151,48 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at1 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_1);
-						if (bestMove.row == 0 && bestMove.col == 0)
+						Move_in_medium optimal_move = find_medium_Move(board_1);
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block1_1 = 1;
 							board_1[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block1_2 = 1;
 							board_1[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block1_3 = 1;
 							board_1[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block1_4 = 1;
 							board_1[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block1_5 = 1;
 							board_1[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block1_6 = 1;
 							board_1[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block1_7 = 1;
 							board_1[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block1_8 = 1;
 							board_1[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block1_9 = 1;
 							board_1[2][2] = 'x';
@@ -2053,49 +2204,49 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at2 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_2);
+						Move_in_medium optimal_move = find_medium_Move(board_2);
 
-						if (bestMove.row == 0 && bestMove.col == 0)
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block2_1 = 1;
 							board_2[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block2_2 = 1;
 							board_2[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block2_3 = 1;
 							board_2[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block2_4 = 1;
 							board_2[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block2_5 = 1;
 							board_2[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block2_6 = 1;
 							board_2[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block2_7 = 1;
 							board_2[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block2_8 = 1;
 							board_2[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block2_9 = 1;
 							board_2[2][2] = 'x';
@@ -2107,48 +2258,48 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at3 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_3);
-						if (bestMove.row == 0 && bestMove.col == 0)
+						Move_in_medium optimal_move = find_medium_Move(board_3);
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block3_1 = 1;
 							board_3[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block3_2 = 1;
 							board_3[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block3_3 = 1;
 							board_3[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block3_4 = 1;
 							board_3[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block3_5 = 1;
 							board_3[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block3_6 = 1;
 							board_3[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block3_7 = 1;
 							board_3[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block3_8 = 1;
 							board_3[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block3_9 = 1;
 							board_3[2][2] = 'x';
@@ -2160,48 +2311,48 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at4 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_4);
-						if (bestMove.row == 0 && bestMove.col == 0)
+						Move_in_medium optimal_move = find_medium_Move(board_4);
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block4_1 = 1;
 							board_4[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block4_2 = 1;
 							board_4[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block4_3 = 1;
 							board_4[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block4_4 = 1;
 							board_4[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block4_5 = 1;
 							board_4[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block4_6 = 1;
 							board_4[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block4_7 = 1;
 							board_4[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block4_8 = 1;
 							board_4[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block4_9 = 1;
 							board_4[2][2] = 'x';
@@ -2216,48 +2367,48 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at1 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_1);
-						if (bestMove.row == 0 && bestMove.col == 0)
+						Move optimal_move = find_the_most_optimal_move(board_1);
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block1_1 = 1;
 							board_1[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block1_2 = 1;
 							board_1[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block1_3 = 1;
 							board_1[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block1_4 = 1;
 							board_1[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block1_5 = 1;
 							board_1[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block1_6 = 1;
 							board_1[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block1_7 = 1;
 							board_1[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block1_8 = 1;
 							board_1[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block1_9 = 1;
 							board_1[2][2] = 'x';
@@ -2269,49 +2420,49 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at2 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_2);
+						Move optimal_move = find_the_most_optimal_move(board_2);
 
-						if (bestMove.row == 0 && bestMove.col == 0)
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block2_1 = 1;
 							board_2[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block2_2 = 1;
 							board_2[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block2_3 = 1;
 							board_2[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block2_4 = 1;
 							board_2[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block2_5 = 1;
 							board_2[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block2_6 = 1;
 							board_2[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block2_7 = 1;
 							board_2[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block2_8 = 1;
 							board_2[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block2_9 = 1;
 							board_2[2][2] = 'x';
@@ -2323,48 +2474,48 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at3 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_3);
-						if (bestMove.row == 0 && bestMove.col == 0)
+						Move optimal_move = find_the_most_optimal_move(board_3);
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block3_1 = 1;
 							board_3[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block3_2 = 1;
 							board_3[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block3_3 = 1;
 							board_3[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block3_4 = 1;
 							board_3[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block3_5 = 1;
 							board_3[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block3_6 = 1;
 							board_3[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block3_7 = 1;
 							board_3[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block3_8 = 1;
 							board_3[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block3_9 = 1;
 							board_3[2][2] = 'x';
@@ -2376,48 +2527,48 @@ void iMouse(int button, int state, int mx, int my)
 						done = 0;
 						player_at4 = 0;
 						current = value_altr(current);
-						Move bestMove = findBestMove(board_4);
-						if (bestMove.row == 0 && bestMove.col == 0)
+						Move optimal_move = find_the_most_optimal_move(board_4);
+						if (optimal_move.row == 0 && optimal_move.col == 0)
 						{
 							block4_1 = 1;
 							board_4[0][0] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 1)
+						else if (optimal_move.row == 0 && optimal_move.col == 1)
 						{
 							block4_2 = 1;
 							board_4[0][1] = 'x';
 						}
-						else if (bestMove.row == 0 && bestMove.col == 2)
+						else if (optimal_move.row == 0 && optimal_move.col == 2)
 						{
 							block4_3 = 1;
 							board_4[0][2] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 0)
+						else if (optimal_move.row == 1 && optimal_move.col == 0)
 						{
 							block4_4 = 1;
 							board_4[1][0] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 1)
+						else if (optimal_move.row == 1 && optimal_move.col == 1)
 						{
 							block4_5 = 1;
 							board_4[1][1] = 'x';
 						}
-						else if (bestMove.row == 1 && bestMove.col == 2)
+						else if (optimal_move.row == 1 && optimal_move.col == 2)
 						{
 							block4_6 = 1;
 							board_4[1][2] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 0)
+						else if (optimal_move.row == 2 && optimal_move.col == 0)
 						{
 							block4_7 = 1;
 							board_4[2][0] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 1)
+						else if (optimal_move.row == 2 && optimal_move.col == 1)
 						{
 							block4_8 = 1;
 							board_4[2][1] = 'x';
 						}
-						else if (bestMove.row == 2 && bestMove.col == 2)
+						else if (optimal_move.row == 2 && optimal_move.col == 2)
 						{
 							block4_9 = 1;
 							board_4[2][2] = 'x';
@@ -2474,11 +2625,7 @@ void iSpecialKeyboard(unsigned char key)
 int main()
 {
 
-	//    PlaySound("home.wav", NULL, SND_LOOP | SND_ASYNC);
-
 	current = 0;
-
-	//    feature();
 	playmusic();
 	iInitialize(1200, 800, "Tic-Tac-Toe");
 	return 0;
