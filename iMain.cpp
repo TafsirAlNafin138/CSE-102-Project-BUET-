@@ -1867,9 +1867,22 @@ void iMouse(int button, int state, int mx, int my)
 
 					if (checkWin(board_1, symbol_2) && pass1 == 1)
 					{
-						player_at2 = 1;
-						player_at1 = 0;
-						pass1 = 0;
+						if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2)){
+							player_at2 = 1;
+							player_at1 = 0;
+							pass1 = 0;
+							current = 4;
+						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3)){
+							player_at3 = 1;
+							player_at1 = 0;
+							pass1 = 0;
+							current = 4;
+						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4)){
+							player_at4 = 1;
+							player_at1 = 0;
+							pass1 = 0;
+							current = 4;
+						}
 					}
 				}
 				// board-2-----------------------------------------------------------------------------------------------------------------
@@ -1950,9 +1963,22 @@ void iMouse(int button, int state, int mx, int my)
 
 					if (checkWin(board_2, symbol_2) && pass2 == 1)
 					{
-						player_at3 = 1;
-						player_at2 = 0;
-						pass2 = 0;
+						if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1)){
+							player_at1 = 1;
+							player_at2 = 0;
+							pass2 = 0;
+							current = 4;
+						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3)){
+							player_at3 = 1;
+							player_at2 = 0;
+							pass2 = 0;
+							current = 4;
+						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4)){
+							player_at4 = 1;
+							player_at2 = 0;
+							pass2 = 0;
+							current = 4;
+						}
 					}
 				}
 				// board-3 ---------------------------------------------------------------------------------------------------------------
@@ -2034,9 +2060,22 @@ void iMouse(int button, int state, int mx, int my)
 
 					if (checkWin(board_3, symbol_2) && pass3 == 1)
 					{
-						player_at4 = 1;
-						player_at3 = 0;
-						pass3 = 0;
+						if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1)){
+							player_at1 = 1;
+							player_at3 = 0;
+							pass3 = 0;
+							current = 4;
+						}else if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2)){
+							player_at2 = 1;
+							player_at3 = 0;
+							pass3 = 0;
+							current = 4;
+						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4)){
+							player_at4 = 1;
+							player_at3 = 0;
+							pass3 = 0;
+							current = 4;
+						}
 					}
 				}
 				// board-4 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -2115,11 +2154,24 @@ void iMouse(int button, int state, int mx, int my)
 						player_at4 = 1;
 					}
 
-					if (checkWin(board_4, symbol_2) && !checkWin(board_1, symbol_2) && pass4 == 1)
+					if (checkWin(board_4, symbol_2) && pass4 == 1)
 					{
-						player_at1 = 1;
-						player_at4 = 0;
-						pass4 = 0;
+						if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2)){
+							player_at2 = 1;
+							player_at4 = 0;
+							pass4 = 0;
+							current = 4;
+						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3)){
+							player_at3 = 1;
+							player_at4 = 0;
+							pass4 = 0;
+							current = 4;
+						}else if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1)){
+							player_at1 = 1;
+							player_at4 = 0;
+							pass4 = 0;
+							current = 4;
+						}
 					}
 				}
 			}
