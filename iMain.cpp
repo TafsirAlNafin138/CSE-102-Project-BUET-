@@ -15,10 +15,16 @@
 #define size 3
 #define player 'o'
 #define opponent 'x'
+#define playerNameLength 20
 
 int o_s_point = 0;
 int x_s_point = 0;
 
+bool isTextBoxActive = false;
+
+char playerName[playerNameLength] = "";
+
+int score = 0;
 
 int win_brd = 0;
 int win_brd1 = 0;
@@ -124,6 +130,11 @@ char symbol_2 = 'o';
 void newgame() {
     o_s_point = 0;
     x_s_point = 0;
+	score = 0;
+
+	isTextBoxActive = false;
+	playerName[playerNameLength] = {'\0'};
+
 
 	 win_brd = 0;
      win_brd1 = 0;
@@ -232,6 +243,94 @@ void newgame() {
     iShowBMP(600, 400, "tic_tac_game-crop (2).bmp");
 }
 
+void saveScore()
+{
+    FILE *ptr = fopen("topScores.txt", "r");
+    int fileScore = 0;
+    char filePlayerName[20] = "None";
+
+    if (ptr != NULL)
+    {
+        fscanf(ptr, "%19[^\n]", filePlayerName);
+        fscanf(ptr, "%d", &fileScore);
+        fclose(ptr);
+    }
+
+    ptr = fopen("topScores.txt", "w");
+    if (ptr == NULL)
+    {
+        printf("Error: Could not write to file.\n");
+        return;
+    }
+
+    if (score >= fileScore)
+    {
+        fprintf(ptr, "%s\n", playerName);
+        fprintf(ptr, "%d", score);
+    }
+    else
+    {
+        fprintf(ptr, "%s\n", filePlayerName);
+        fprintf(ptr, "%d", fileScore);
+    }
+    fclose(ptr);
+}
+
+void loadScore()
+{
+    FILE *ptr = fopen("topScores.txt", "r");
+    int fileScore = 0;
+    char filePlayerName[20] = "None";
+
+    if (ptr != NULL)
+    {
+        fscanf(ptr, "%19[^\n]", filePlayerName);
+        fscanf(ptr, "%d", &fileScore);
+        fclose(ptr);
+    }
+    else
+    {
+        printf("No high score file found. Using defaults.\n");
+    }
+
+    char showingScore[1000];
+    sprintf(showingScore, "%d", fileScore);
+	iSetColor(255, 255, 255);
+    iText(500, 400, "PlayerName: ", GLUT_BITMAP_TIMES_ROMAN_24);
+	iSetColor(255, 255, 255);
+    iText(500, 360, filePlayerName, GLUT_BITMAP_TIMES_ROMAN_24);
+	iSetColor(255, 255, 255);
+    iText(500, 300, "Score: ", GLUT_BITMAP_TIMES_ROMAN_24);
+	iSetColor(255, 255, 255);
+    iText(600, 300, showingScore, GLUT_BITMAP_TIMES_ROMAN_24);
+}
+void drawGameOverPage()
+{
+    iSetColor(103, 217, 10);
+    iFilledRectangle(445, 350, 300, 80);
+    iSetColor(0, 0, 0);
+    iText(450, 410, "Player Name???", GLUT_BITMAP_TIMES_ROMAN_24);
+    iText(450, 391, playerName, GLUT_BITMAP_TIMES_ROMAN_24);
+    // printf("%s\t %d\n", playerName, score);
+}
+
+void drawScorePage()
+{
+    iSetColor(208, 255, 250);
+	iShowBMP(0, 0, "Game_homepage-blur.bmp");
+    iShowBMP(100, 100, "scorePage.bmp");
+    iShowBMP(930, 634, "backButton.bmp");
+    iSetColor(255, 255, 255);
+	saveScore();
+    loadScore();
+}
+
+// void give_input(){
+// 	iSetColor(255, 255, 255);
+//     iText(650, 410, "Player Name???", GLUT_BITMAP_TIMES_ROMAN_24);
+//     // iText(450, 391, playerName, GLUT_BITMAP_TIMES_ROMAN_24);
+// }
+
 void playmusic()
 {
 	if (current == 0)
@@ -243,7 +342,11 @@ void nevigate(int button, int state, int mx, int my)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
+		
 		PlaySound("move.wav", NULL, SND_ASYNC);
+		if(mx >= 12 && mx <= 67 && my >= 747 && my <= 780){
+			current = -5;
+		}
 		if (mx >= 450 && mx <= 746 && my >= 179 && my <= 214)
 		{
 			exit(0);
@@ -278,6 +381,20 @@ void Ai_mode(int current, int button, int state, int mx, int my)
 				hard = 1;
 			}
 		}
+	}
+}
+
+void settings(int button, int state, int mx, int my)
+{
+	if(mx >= 3 && mx <= 85 && my >= 771 && my <= 795){
+		current = 0;
+		playmusic();
+	}
+	if(mx >= 366 && mx <= 840 && my >= 444 && my <= 567){
+		current = -10;
+	}
+	if(mx >= 366 && mx <= 840 && my >= 229 && my <= 357){
+		current = 100;
 	}
 }
 // int done = 0;
@@ -343,13 +460,13 @@ int evalute_the_board_mid(char board[3][3]) {
 }
 
 int medium_diff(char board[3][3], int depth, int is_max) {
-    int score = evalute_the_board_mid(board);
+    int gain_point = evalute_the_board_mid(board);
 
-    if (score == 10)
-        return score;
+    if (gain_point == 10)
+        return gain_point;
 
-    if (score == -3)
-        return score;
+    if (gain_point == -3)
+        return gain_point;
 
     if (!check_available_moves_mid(board))
         return 0;
@@ -494,16 +611,16 @@ int evalute_the_board(char board[3][3])
 
 int minimax(char board[3][3], int depth, int is_max)
 {
-	int score = evalute_the_board(board);
+	int gain_point = evalute_the_board(board);
 
-	if (score == 10)
+	if (gain_point == 10)
 	{
-		return (score - depth);
+		return (gain_point - depth);
 	}
 
-	if (score == -10)
+	if (gain_point == -10)
 	{
-		return (score + depth);
+		return (gain_point + depth);
 	}
 
 	if (!check_available_moves(board))
@@ -649,7 +766,10 @@ void iDraw()
 	if (current == 0)
 	{   newgame();
 		iShowBMP(0, 0, "Game_homepage.bmp");
+		iShowBMP2(0,720, "settings.bmp", 0);
 		
+	}else if(current == -5){
+		iShowBMP(0, 0, "setting_pic.bmp");
 	}else if((current == 2 || current == 1) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
 		Sleep(2000);
 		if(win_data == 1){
@@ -671,6 +791,18 @@ void iDraw()
 			// printf("%d \t %d \n",o_s_point,x_s_point);
 			}
 		iShowBMP2(565, 100, "replay.bmp", 0);
+	}
+	else if(current == 100){
+		drawScorePage();
+	}
+	else if((current == 3 || current == 4) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
+		Sleep(2000);
+		if(win_data == 1){
+		PlaySound("win_end.wav", NULL, SND_ASYNC);
+		win_data = 0;
+		}
+		iShowBMP(0,0,"vsComp_end.bmp");
+		drawGameOverPage();
 	}
 	else if (current == 3 && easy == 0 && medium == 0 && hard == 0)
 	{
@@ -911,8 +1043,19 @@ void iDraw()
 		{
 			done_bord1 = 1;
 			if(win_brd == 0){
+				if(hard == 1){
+					score += 10;
+				    win_brd = 1;
+				}else if(medium == 1){
+					score += 5;
+				    win_brd = 1;
+				}else if(easy == 1){
+					score += 1;
+				    win_brd = 1;
+				}else{
 				o_s_point += 2;
 				win_brd = 1;
+				}
 			}
 			iShowBMP(239, 40, "X_win.bmp");
 			iShowBMP(239, 350, "owon.bmp");
@@ -966,8 +1109,19 @@ void iDraw()
 		{
 			done_bord2 = 1;
 			if(win_brd1 == 0){
+				if(hard == 1){
+					score += 10;
+				    win_brd1 = 1;
+				}else if(medium == 1){
+					score += 5;
+				    win_brd1 = 1;
+				}else if(easy == 1){
+					score += 1;
+				    win_brd1 = 1;
+				}else{
 				o_s_point += 2;
 				win_brd1 = 1;
+				}
 			}
 			iShowBMP(239, 430, "X_win.bmp");
 			iShowBMP(239, 740, "owon.bmp");
@@ -1021,8 +1175,19 @@ void iDraw()
 		{
 			done_bord3 = 1;
 			if(win_brd2 == 0){
+				if(hard == 1){
+					score += 10;
+				    win_brd2 = 1;
+				}else if(medium == 1){
+					score += 5;
+				    win_brd2 = 1;
+				}else if(easy == 1){
+					score += 1;
+				    win_brd2 = 1;
+				}else{
 				o_s_point += 2;
 				win_brd2 = 1;
+				}
 			}
 			iShowBMP(625, 40, "X_win.bmp");
 			iShowBMP(625, 350, "owon.bmp");
@@ -1076,8 +1241,19 @@ void iDraw()
 		{
 			done_bord4 = 1;
 			if(win_brd3 == 0){
+				if(hard == 1){
+					score += 10;
+				    win_brd3 = 1;
+				}else if(medium == 1){
+					score += 5;
+				    win_brd3 = 1;
+				}else if(easy == 1){
+					score += 1;
+				    win_brd3 = 1;
+				}else{
 				o_s_point += 2;
 				win_brd3 = 1;
+				}
 			}
 			iShowBMP(625, 430, "X_win.bmp");
 			iShowBMP(625, 740, "owon.bmp");
@@ -1230,15 +1406,50 @@ void iMouse(int button, int state, int mx, int my)
 	}else if((current == 2 || current == 1) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
+			PlaySound("move.wav", NULL, SND_ASYNC);
 			if (mx >= 567 && mx <= 630 && my >= 106 && my <= 168)
 			{
 				PlaySound("move.wav", NULL, SND_ASYNC);
 				newgame();
 				current = 0;
+				playmusic();
 				
 			}
 		}
+	}else if(current == -5){
+		settings(button, state, mx, my);
+	}else if((current == 3 || current == 4) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+		{
+			PlaySound("move.wav", NULL, SND_ASYNC);
+			if (mx >= 445 && mx <= 743 && my >= 365 && my <= 414)
+			{
+				isTextBoxActive = true;
+			}
+			
+			if(mx >= 520 && mx <= 675 && my >= 250 && my <= 288){
+				if(playerName[0] != '\0')
+			{
+				saveScore();
+				current = 0;
+				playmusic();
+			}else{
+			PlaySound("tie.wav", NULL, SND_ASYNC);
+			}
+			}
+			}
+	}else if(current == 100){
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+		{
+			PlaySound("move.wav", NULL, SND_ASYNC);
+			if (mx >= 929 && mx <= 1099 && my >= 635 && my <= 700)
+			{
+				current = 0;
+				playmusic();
+			}
+		}
 	}
+	
 	else if (current == 3 && easy == 0 && medium == 0 && hard == 0)
 	{
 		PlaySound("move.wav", NULL, SND_ASYNC);
@@ -1865,19 +2076,19 @@ void iMouse(int button, int state, int mx, int my)
 						player_at1 = 1;
 					}
 
-					if (checkWin(board_1, symbol_2) && pass1 == 1)
+					if ((checkWin(board_1, symbol_2) || checkDraw(board_1)) && pass1 == 1)
 					{
-						if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2)){
+						if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2) && pass1 == 1){
 							player_at2 = 1;
 							player_at1 = 0;
 							pass1 = 0;
 							current = 4;
-						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3)){
+						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3) && pass1 == 1){
 							player_at3 = 1;
 							player_at1 = 0;
 							pass1 = 0;
 							current = 4;
-						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4)){
+						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4) && pass1 == 1){
 							player_at4 = 1;
 							player_at1 = 0;
 							pass1 = 0;
@@ -1961,19 +2172,19 @@ void iMouse(int button, int state, int mx, int my)
 						player_at2 = 1;
 					}
 
-					if (checkWin(board_2, symbol_2) && pass2 == 1)
+					if ((checkWin(board_2, symbol_2)|| checkDraw(board_2)) && pass2 == 1)
 					{
-						if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1)){
+						if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1) && pass2 == 1){
 							player_at1 = 1;
 							player_at2 = 0;
 							pass2 = 0;
 							current = 4;
-						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3)){
+						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3) && pass2 == 1){
 							player_at3 = 1;
 							player_at2 = 0;
 							pass2 = 0;
 							current = 4;
-						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4)){
+						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4) && pass2 == 1){
 							player_at4 = 1;
 							player_at2 = 0;
 							pass2 = 0;
@@ -2058,19 +2269,19 @@ void iMouse(int button, int state, int mx, int my)
 						player_at3 = 1;
 					}
 
-					if (checkWin(board_3, symbol_2) && pass3 == 1)
+					if ((checkWin(board_3, symbol_2)|| checkDraw(board_3)) && pass3 == 1)
 					{
-						if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1)){
+						if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1) && pass3 == 1){
 							player_at1 = 1;
 							player_at3 = 0;
 							pass3 = 0;
 							current = 4;
-						}else if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2)){
+						}else if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2) && pass3 == 1){
 							player_at2 = 1;
 							player_at3 = 0;
 							pass3 = 0;
 							current = 4;
-						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4)){
+						}else if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o') && !checkDraw(board_4) && (checkWin(board_3, symbol_2) || checkDraw(board_3)) && pass3 == 1){
 							player_at4 = 1;
 							player_at3 = 0;
 							pass3 = 0;
@@ -2154,19 +2365,19 @@ void iMouse(int button, int state, int mx, int my)
 						player_at4 = 1;
 					}
 
-					if (checkWin(board_4, symbol_2) && pass4 == 1)
+					if ((checkWin(board_4, symbol_2) || checkDraw(board_4)) && pass4 == 1)
 					{
-						if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o') && !checkDraw(board_2)){
+						if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3) && pass4 == 1){
 							player_at2 = 1;
 							player_at4 = 0;
 							pass4 = 0;
 							current = 4;
-						}else if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o') && !checkDraw(board_3)){
+						}else if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1) && (checkWin(board_4, symbol_2) || checkDraw(board_4)) && pass4 == 1){
 							player_at3 = 1;
 							player_at4 = 0;
 							pass4 = 0;
 							current = 4;
-						}else if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1)){
+						}else if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o') && !checkDraw(board_1) && (checkWin(board_4, symbol_2) || checkDraw(board_4)) && pass4 == 1){
 							player_at1 = 1;
 							player_at4 = 0;
 							pass4 = 0;
@@ -2235,6 +2446,12 @@ void iMouse(int button, int state, int mx, int my)
 						{
 							block1_9 = 1;
 						}
+
+						if(checkWin(board_1, symbol_1) || checkDraw(board_1)){
+					               pass1 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_2, symbol_1) && player_at2 == 1)
@@ -2293,6 +2510,11 @@ void iMouse(int button, int state, int mx, int my)
 						{
 							block2_9 = 1;
 						}
+						if(checkWin(board_2, symbol_1) || checkDraw(board_2)){
+					               pass2 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_3, symbol_1) && player_at3 == 1)
@@ -2351,6 +2573,11 @@ void iMouse(int button, int state, int mx, int my)
 						{
 							block3_9 = 1;
 						}
+						if(checkWin(board_3, symbol_1) || checkDraw(board_3)){
+					               pass3 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_4, symbol_1) && player_at4 == 1)
@@ -2409,6 +2636,11 @@ void iMouse(int button, int state, int mx, int my)
 						{
 							block4_9 = 1;
 						}
+						if(checkWin(board_4, symbol_1) || checkDraw(board_4)){
+					               pass4 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 					current = 3;
 				}
@@ -2466,6 +2698,11 @@ void iMouse(int button, int state, int mx, int my)
 							block1_9 = 1;
 							board_1[2][2] = 'x';
 						}
+						if(checkWin(board_1, symbol_1) || checkDraw(board_1)){
+					               pass1 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_2, symbol_1) && player_at2 == 1)
@@ -2520,6 +2757,11 @@ void iMouse(int button, int state, int mx, int my)
 							block2_9 = 1;
 							board_2[2][2] = 'x';
 						}
+						if(checkWin(board_2, symbol_1) || checkDraw(board_2)){
+					               pass2 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_3, symbol_1) && player_at3 == 1)
@@ -2573,6 +2815,11 @@ void iMouse(int button, int state, int mx, int my)
 							block3_9 = 1;
 							board_3[2][2] = 'x';
 						}
+						if(checkWin(board_3, symbol_1) || checkDraw(board_3)){
+					               pass3 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_4, symbol_1) && player_at4 == 1)
@@ -2626,6 +2873,11 @@ void iMouse(int button, int state, int mx, int my)
 							block4_9 = 1;
 							board_4[2][2] = 'x';
 						}
+						if(checkWin(board_4, symbol_1) || checkDraw(board_4)){
+					               pass4 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 					current = 3;
 				}
@@ -2682,6 +2934,11 @@ void iMouse(int button, int state, int mx, int my)
 							block1_9 = 1;
 							board_1[2][2] = 'x';
 						}
+						if(checkWin(board_1, symbol_1) || checkDraw(board_1)){
+					               pass1 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_2, symbol_1) && player_at2 == 1)
@@ -2736,6 +2993,11 @@ void iMouse(int button, int state, int mx, int my)
 							block2_9 = 1;
 							board_2[2][2] = 'x';
 						}
+						if(checkWin(board_2, symbol_1) || checkDraw(board_2)){
+					               pass2 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
 					if (!checkWin(board_3, symbol_1) && player_at3 == 1)
@@ -2789,15 +3051,20 @@ void iMouse(int button, int state, int mx, int my)
 							block3_9 = 1;
 							board_3[2][2] = 'x';
 						}
+						if(checkWin(board_3, symbol_1) || checkDraw(board_3)){
+					               pass3 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 
-					if (!checkWin(board_4, symbol_1) && player_at4 == 1)
+					if (!checkWin(board_4, symbol_1) && player_at4 == 1 && player_at3 != 1)
 					{
 						done = 0;
 						player_at4 = 0;
 						current = value_altr(current);
 						Move optimal_move = find_the_most_optimal_move(board_4);
-						if (optimal_move.row == 0 && optimal_move.col == 0)
+						if (optimal_move.row == 0 && optimal_move.col == 0 && player_at3 != 1)
 						{
 							block4_1 = 1;
 							board_4[0][0] = 'x';
@@ -2842,6 +3109,11 @@ void iMouse(int button, int state, int mx, int my)
 							block4_9 = 1;
 							board_4[2][2] = 'x';
 						}
+						if(checkWin(board_4, symbol_1) || checkDraw(board_4)){
+					               pass4 = 0;
+								   current = 3;
+					   }
+						current = 3;
 					}
 					current = 3;
 				}
@@ -2867,6 +3139,23 @@ key- holds the ASCII value of the key pressed.
 */
 void iKeyboard(unsigned char key)
 {
+	if (isTextBoxActive)
+    {
+        if (key == '\r')
+            isTextBoxActive = false;
+        else if (key == '\b')
+        {
+            int len = strlen(playerName);
+            if (len > 0)
+                playerName[len - 1] = '\0';
+        }
+        else if (strlen(playerName) < playerNameLength)
+        {
+            const char ch = (char)key;
+            strncat(playerName, &ch, 1);
+            // printf("%s\n", playerName);
+        }
+    }
 	if (key == 'q')
 	{
 		exit(0);
