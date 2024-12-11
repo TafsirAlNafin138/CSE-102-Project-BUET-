@@ -25,6 +25,8 @@ bool isTextBoxActive = false;
 char playerName[playerNameLength] = "";
 
 int score = 0;
+int music = 1;
+int idx = 0;
 
 int win_brd = 0;
 int win_brd1 = 0;
@@ -131,6 +133,7 @@ void newgame() {
     o_s_point = 0;
     x_s_point = 0;
 	score = 0;
+	idx = 0;
 
 	isTextBoxActive = false;
 	playerName[playerNameLength] = {'\0'};
@@ -236,73 +239,93 @@ void newgame() {
         }
     }
     iClear();
-    iShowBMP(0, 0, "project_bg.bmp");
-    iShowBMP(210, 10, "tic_tac_game-crop (2).bmp");
-    iShowBMP(210, 400, "tic_tac_game-crop (2).bmp");
-    iShowBMP(600, 10, "tic_tac_game-crop (2).bmp");
-    iShowBMP(600, 400, "tic_tac_game-crop (2).bmp");
+    iShowBMP(0, 0, "resources\\project_bg.bmp");
+    iShowBMP(210, 10, "resources\\tic_tac_game-crop (2).bmp");
+    iShowBMP(210, 400, "resources\\tic_tac_game-crop (2).bmp");
+    iShowBMP(600, 10, "resources\\tic_tac_game-crop (2).bmp");
+    iShowBMP(600, 400, "resources\\tic_tac_game-crop (2).bmp");
+}
+struct Player_file {
+	char name[playerNameLength];
+	int Score;
+};
+
+void saveScore() {
+	Player_file players[6] = {0};
+	int count = 0;
+
+	FILE *ptr = fopen("topScores.txt", "r");
+	if (ptr != NULL) {
+		while (count < 5 && fscanf(ptr, "%19s %d", players[count].name, &players[count].Score) == 2) {
+			count++;
+		}
+		fclose(ptr);
+	}
+
+	int position = count;
+	for (int i = 0; i < count; i++) {
+		if (score >= players[i].Score) {
+			position = i;
+			break;
+		}
+	}
+
+	if (position < 5) {
+		if (count < 5) count++;
+		for (int i = count - 1; i > position; i--) {
+			players[i] = players[i - 1];
+		}
+		strcpy(players[position].name, playerName);
+		players[position].Score = score;
+	}
+
+	ptr = fopen("topScores.txt", "w");
+	if (ptr == NULL) {
+		printf("Error: Could not write to file.\n");
+		return;
+	}
+
+	for (int i = 0; i < count; i++) {
+		fprintf(ptr, "%s %d\n", players[i].name, players[i].Score);
+	}
+	fclose(ptr);
 }
 
-void saveScore()
-{
-    FILE *ptr = fopen("topScores.txt", "r");
-    int fileScore = 0;
-    char filePlayerName[20] = "None";
+void loadScore() {
+	Player_file players[6];
+	int count = 0;
 
-    if (ptr != NULL)
-    {
-        fscanf(ptr, "%19[^\n]", filePlayerName);
-        fscanf(ptr, "%d", &fileScore);
-        fclose(ptr);
-    }
+	FILE *ptr = fopen("topScores.txt", "r");
+	if (ptr != NULL) {
+		while (fscanf(ptr, "%19s %d", players[count].name, &players[count].Score) != EOF && count < 5) {
+			count++;
+		}
+		fclose(ptr);
+	}
 
-    ptr = fopen("topScores.txt", "w");
-    if (ptr == NULL)
-    {
-        printf("Error: Could not write to file.\n");
-        return;
-    }
-
-    if (score >= fileScore)
-    {
-        fprintf(ptr, "%s\n", playerName);
-        fprintf(ptr, "%d", score);
-    }
-    else
-    {
-        fprintf(ptr, "%s\n", filePlayerName);
-        fprintf(ptr, "%d", fileScore);
-    }
-    fclose(ptr);
+	iSetColor(255, 255, 255);
+	iText(500, 500, "Player Name", GLUT_BITMAP_TIMES_ROMAN_24);
+	iText(650, 500, "Score", GLUT_BITMAP_TIMES_ROMAN_24);
+	for (int i = 0; i < count; i++) {
+		if (players[i].Score == 0 || players[i].name[0] == '\0') break;
+		char showingScore[1000];
+		char showingScore1[1000];
+		sprintf(showingScore, "%s", players[i].name);
+		sprintf(showingScore1, "%d", players[i].Score);
+		iText(500, 460 - i * 50, showingScore, GLUT_BITMAP_TIMES_ROMAN_24);
+		iText(660, 460 - i * 50, showingScore1, GLUT_BITMAP_TIMES_ROMAN_24);
+	}
 }
 
-void loadScore()
+void drawScorePage()
 {
-    FILE *ptr = fopen("topScores.txt", "r");
-    int fileScore = 0;
-    char filePlayerName[20] = "None";
-
-    if (ptr != NULL)
-    {
-        fscanf(ptr, "%19[^\n]", filePlayerName);
-        fscanf(ptr, "%d", &fileScore);
-        fclose(ptr);
-    }
-    else
-    {
-        printf("No high score file found. Using defaults.\n");
-    }
-
-    char showingScore[1000];
-    sprintf(showingScore, "%d", fileScore);
-	iSetColor(255, 255, 255);
-    iText(500, 400, "PlayerName: ", GLUT_BITMAP_TIMES_ROMAN_24);
-	iSetColor(255, 255, 255);
-    iText(500, 360, filePlayerName, GLUT_BITMAP_TIMES_ROMAN_24);
-	iSetColor(255, 255, 255);
-    iText(500, 300, "Score: ", GLUT_BITMAP_TIMES_ROMAN_24);
-	iSetColor(255, 255, 255);
-    iText(600, 300, showingScore, GLUT_BITMAP_TIMES_ROMAN_24);
+    iSetColor(208, 255, 250);
+	iShowBMP(0, 0, "resources\\Game_homepage-blur.bmp");
+    iShowBMP(100, 100, "resources\\scorePage.bmp");
+    iShowBMP(930, 634, "resources\\backButton.bmp");
+    iSetColor(255, 255, 255);
+	saveScore();
+    loadScore();
 }
 void drawGameOverPage()
 {
@@ -314,16 +337,6 @@ void drawGameOverPage()
     // printf("%s\t %d\n", playerName, score);
 }
 
-void drawScorePage()
-{
-    iSetColor(208, 255, 250);
-	iShowBMP(0, 0, "Game_homepage-blur.bmp");
-    iShowBMP(100, 100, "scorePage.bmp");
-    iShowBMP(930, 634, "backButton.bmp");
-    iSetColor(255, 255, 255);
-	saveScore();
-    loadScore();
-}
 
 // void give_input(){
 // 	iSetColor(255, 255, 255);
@@ -333,9 +346,9 @@ void drawScorePage()
 
 void playmusic()
 {
-	if (current == 0)
+	if (current == 0 && music == 1)
 	{
-		PlaySound("home.wav", NULL, SND_LOOP | SND_ASYNC);
+		PlaySound("resources\\home.wav", NULL, SND_LOOP | SND_ASYNC);
 	}
 }
 void nevigate(int button, int state, int mx, int my)
@@ -343,9 +356,9 @@ void nevigate(int button, int state, int mx, int my)
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
 		
-		PlaySound("move.wav", NULL, SND_ASYNC);
+		PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 		if(mx >= 12 && mx <= 67 && my >= 747 && my <= 780){
-			current = -5;
+			current = 25;
 		}
 		if (mx >= 450 && mx <= 746 && my >= 179 && my <= 214)
 		{
@@ -391,7 +404,7 @@ void settings(int button, int state, int mx, int my)
 		playmusic();
 	}
 	if(mx >= 366 && mx <= 840 && my >= 444 && my <= 567){
-		current = -10;
+		current = 50;
 	}
 	if(mx >= 366 && mx <= 840 && my >= 229 && my <= 357){
 		current = 100;
@@ -765,32 +778,34 @@ void iDraw()
 	// printf("%d \t %d \t %d \t %d\n", win_brd, win_brd1, win_brd2, win_brd3);
 	if (current == 0)
 	{   newgame();
-		iShowBMP(0, 0, "Game_homepage.bmp");
-		iShowBMP2(0,720, "settings.bmp", 0);
+		iShowBMP(0, 0, "resources\\Game_homepage.bmp");
+		iShowBMP2(0,720, "resources\\settings.bmp", 0);
 		
-	}else if(current == -5){
-		iShowBMP(0, 0, "setting_pic.bmp");
+	}else if(current == 25){
+		iShowBMP(0, 0, "resources\\setting_pic.bmp");
+	}else if(current == 50){
+		iShowBMP(0,0,"resources\\Rules_page.bmp");
 	}else if((current == 2 || current == 1) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
 		Sleep(2000);
 		if(win_data == 1){
-		PlaySound("win_end.wav", NULL, SND_ASYNC);
+		PlaySound("resources\\win_end.wav", NULL, SND_ASYNC);
 		win_data = 0;
 		}
-		iShowBMP(0, 0, "Who won The Game.bmp");
+		iShowBMP(0, 0, "resources\\Who won The Game.bmp");
 		if(o_s_point == x_s_point){
 				
-				iShowBMP(440, 680, "draw_con.bmp");
+				iShowBMP(440, 680, "resources\\draw_con.bmp");
 				// printf("%d \t %d \n",o_s_point,x_s_point);
 		    }
         else if(o_s_point >= x_s_point){
-				iShowBMP(440, 680, "owon_con.bmp");
+				iShowBMP(440, 680, "resources\\owon_con.bmp");
 				// printf("%d \t %d \n",o_s_point,x_s_point);
 		}
 		else if(x_s_point > o_s_point){
-			iShowBMP(440, 680, "xwon_con.bmp");
+			iShowBMP(440, 680, "resources\\xwon_con.bmp");
 			// printf("%d \t %d \n",o_s_point,x_s_point);
 			}
-		iShowBMP2(565, 100, "replay.bmp", 0);
+		iShowBMP2(565, 100, "resources\\replay.bmp", 0);
 	}
 	else if(current == 100){
 		drawScorePage();
@@ -798,24 +813,24 @@ void iDraw()
 	else if((current == 3 || current == 4) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
 		Sleep(2000);
 		if(win_data == 1){
-		PlaySound("win_end.wav", NULL, SND_ASYNC);
+		PlaySound("resources\\win_end.wav", NULL, SND_ASYNC);
 		win_data = 0;
 		}
-		iShowBMP(0,0,"vsComp_end.bmp");
+		iShowBMP(0,0,"resources\\vsComp_end.bmp");
 		drawGameOverPage();
 	}
 	else if (current == 3 && easy == 0 && medium == 0 && hard == 0)
 	{
-		iShowBMP(0, 0, "Game_homepage-blur.bmp");
-		iShowBMP(437, 230, "AI_mode.bmp");
+		iShowBMP(0, 0, "resources\\Game_homepage-blur.bmp");
+		iShowBMP(437, 230, "resources\\AI_mode.bmp");
 	}
 	else if (current > 0)
 	{
-		iShowBMP(0, 0, "project_bg.bmp");
-		iShowBMP(210, 10, "tic_tac_game-crop (2).bmp");
-		iShowBMP(210, 400, "tic_tac_game-crop (2).bmp");
-		iShowBMP(600, 10, "tic_tac_game-crop (2).bmp");
-		iShowBMP(600, 400, "tic_tac_game-crop (2).bmp");
+		iShowBMP(0, 0, "resources\\project_bg.bmp");
+		iShowBMP(210, 10, "resources\\tic_tac_game-crop (2).bmp");
+		iShowBMP(210, 400, "resources\\tic_tac_game-crop (2).bmp");
+		iShowBMP(600, 10, "resources\\tic_tac_game-crop (2).bmp");
+		iShowBMP(600, 400, "resources\\tic_tac_game-crop (2).bmp");
 
 		if (checkWin(board_1, 'x'))
 		{
@@ -825,11 +840,11 @@ void iDraw()
 				win_brd = 1;
 			}
 			
-			iShowBMP(239, 350, "xwon.bmp");
-			iShowBMP(239, 40, "X_win.bmp");
+			iShowBMP(239, 350, "resources\\xwon.bmp");
+			iShowBMP(239, 40, "resources\\X_win.bmp");
 			if (data1 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data1 = 0;
 			}
 		}
@@ -837,39 +852,39 @@ void iDraw()
 		{
 			if (block1_1 == 1)
 			{
-				iShowBMP2(250, 50, "cross.bmp", 0);
+				iShowBMP2(250, 50, "resources\\cross.bmp", 0);
 			}
 			if (block1_2 == 1)
 			{
-				iShowBMP2(365, 50, "cross.bmp", 0);
+				iShowBMP2(365, 50, "resources\\cross.bmp", 0);
 			}
 			if (block1_3 == 1)
 			{
-				iShowBMP2(480, 50, "cross.bmp", 0);
+				iShowBMP2(480, 50, "resources\\cross.bmp", 0);
 			}
 			if (block1_4 == 1)
 			{
-				iShowBMP2(250, 165, "cross.bmp", 0);
+				iShowBMP2(250, 165, "resources\\cross.bmp", 0);
 			}
 			if (block1_5 == 1)
 			{
-				iShowBMP2(365, 165, "cross.bmp", 0);
+				iShowBMP2(365, 165, "resources\\cross.bmp", 0);
 			}
 			if (block1_6 == 1)
 			{
-				iShowBMP2(480, 165, "cross.bmp", 0);
+				iShowBMP2(480, 165, "resources\\cross.bmp", 0);
 			}
 			if (block1_7 == 1)
 			{
-				iShowBMP2(250, 280, "cross.bmp", 0);
+				iShowBMP2(250, 280, "resources\\cross.bmp", 0);
 			}
 			if (block1_8 == 1)
 			{
-				iShowBMP2(365, 280, "cross.bmp", 0);
+				iShowBMP2(365, 280, "resources\\cross.bmp", 0);
 			}
 			if (block1_9 == 1)
 			{
-				iShowBMP2(480, 280, "cross.bmp", 0);
+				iShowBMP2(480, 280, "resources\\cross.bmp", 0);
 			}
 		}
 
@@ -880,12 +895,12 @@ void iDraw()
 				x_s_point += 2;
 				win_brd1 = 1;
 			}
-			iShowBMP(238, 740, "xwon.bmp");
-			iShowBMP(238, 430, "X_win.bmp");
+			iShowBMP(238, 740, "resources\\xwon.bmp");
+			iShowBMP(238, 430, "resources\\X_win.bmp");
 			
 			if (data2 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data2 = 0;
 			}
 		}
@@ -893,39 +908,39 @@ void iDraw()
 		{
 			if (block2_1 == 1)
 			{
-				iShowBMP2(250, 440, "cross.bmp", 0);
+				iShowBMP2(250, 440, "resources\\cross.bmp", 0);
 			}
 			if (block2_2 == 1)
 			{
-				iShowBMP2(365, 440, "cross.bmp", 0);
+				iShowBMP2(365, 440, "resources\\cross.bmp", 0);
 			}
 			if (block2_3 == 1)
 			{
-				iShowBMP2(480, 440, "cross.bmp", 0);
+				iShowBMP2(480, 440, "resources\\cross.bmp", 0);
 			}
 			if (block2_4 == 1)
 			{
-				iShowBMP2(250, 555, "cross.bmp", 0);
+				iShowBMP2(250, 555, "resources\\cross.bmp", 0);
 			}
 			if (block2_5 == 1)
 			{
-				iShowBMP2(365, 555, "cross.bmp", 0);
+				iShowBMP2(365, 555, "resources\\cross.bmp", 0);
 			}
 			if (block2_6 == 1)
 			{
-				iShowBMP2(480, 555, "cross.bmp", 0);
+				iShowBMP2(480, 555, "resources\\cross.bmp", 0);
 			}
 			if (block2_7 == 1)
 			{
-				iShowBMP2(250, 670, "cross.bmp", 0);
+				iShowBMP2(250, 670, "resources\\cross.bmp", 0);
 			}
 			if (block2_8 == 1)
 			{
-				iShowBMP2(365, 670, "cross.bmp", 0);
+				iShowBMP2(365, 670, "resources\\cross.bmp", 0);
 			}
 			if (block2_9 == 1)
 			{
-				iShowBMP2(480, 670, "cross.bmp", 0);
+				iShowBMP2(480, 670, "resources\\cross.bmp", 0);
 			}
 		}
 
@@ -936,11 +951,11 @@ void iDraw()
 				x_s_point += 2;
 				win_brd2 = 1;
 			}
-			iShowBMP(625, 40, "X_win.bmp");
-			iShowBMP(625, 350, "xwon.bmp");
+			iShowBMP(625, 40, "resources\\X_win.bmp");
+			iShowBMP(625, 350, "resources\\xwon.bmp");
 			if (data3 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data3 = 0;
 			}
 		}
@@ -948,39 +963,39 @@ void iDraw()
 		{
 			if (block3_1 == 1)
 			{
-				iShowBMP2(640, 50, "cross.bmp", 0);
+				iShowBMP2(640, 50, "resources\\cross.bmp", 0);
 			}
 			if (block3_2 == 1)
 			{
-				iShowBMP2(755, 50, "cross.bmp", 0);
+				iShowBMP2(755, 50, "resources\\cross.bmp", 0);
 			}
 			if (block3_3 == 1)
 			{
-				iShowBMP2(870, 50, "cross.bmp", 0);
+				iShowBMP2(870, 50, "resources\\cross.bmp", 0);
 			}
 			if (block3_4 == 1)
 			{
-				iShowBMP2(640, 165, "cross.bmp", 0);
+				iShowBMP2(640, 165, "resources\\cross.bmp", 0);
 			}
 			if (block3_5 == 1)
 			{
-				iShowBMP2(755, 165, "cross.bmp", 0);
+				iShowBMP2(755, 165, "resources\\cross.bmp", 0);
 			}
 			if (block3_6 == 1)
 			{
-				iShowBMP2(870, 165, "cross.bmp", 0);
+				iShowBMP2(870, 165, "resources\\cross.bmp", 0);
 			}
 			if (block3_7 == 1)
 			{
-				iShowBMP2(640, 280, "cross.bmp", 0);
+				iShowBMP2(640, 280, "resources\\cross.bmp", 0);
 			}
 			if (block3_8 == 1)
 			{
-				iShowBMP2(755, 280, "cross.bmp", 0);
+				iShowBMP2(755, 280, "resources\\cross.bmp", 0);
 			}
 			if (block3_9 == 1)
 			{
-				iShowBMP2(870, 280, "cross.bmp", 0);
+				iShowBMP2(870, 280, "resources\\cross.bmp", 0);
 			}
 		}
 
@@ -991,11 +1006,11 @@ void iDraw()
 				x_s_point += 2;
 				win_brd3 = 1;
 			}
-			iShowBMP(625, 430, "X_win.bmp");
-			iShowBMP(625, 740, "xwon.bmp");
+			iShowBMP(625, 430, "resources\\X_win.bmp");
+			iShowBMP(625, 740, "resources\\xwon.bmp");
 			if (data4 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data4 = 0;
 			}
 		}
@@ -1003,39 +1018,39 @@ void iDraw()
 		{
 			if (block4_1 == 1)
 			{
-				iShowBMP2(640, 440, "cross.bmp", 0);
+				iShowBMP2(640, 440, "resources\\cross.bmp", 0);
 			}
 			if (block4_2 == 1)
 			{
-				iShowBMP2(755, 440, "cross.bmp", 0);
+				iShowBMP2(755, 440, "resources\\cross.bmp", 0);
 			}
 			if (block4_3 == 1)
 			{
-				iShowBMP2(870, 440, "cross.bmp", 0);
+				iShowBMP2(870, 440, "resources\\cross.bmp", 0);
 			}
 			if (block4_4 == 1)
 			{
-				iShowBMP2(640, 555, "cross.bmp", 0);
+				iShowBMP2(640, 555, "resources\\cross.bmp", 0);
 			}
 			if (block4_5 == 1)
 			{
-				iShowBMP2(755, 555, "cross.bmp", 0);
+				iShowBMP2(755, 555, "resources\\cross.bmp", 0);
 			}
 			if (block4_6 == 1)
 			{
-				iShowBMP2(870, 555, "cross.bmp", 0);
+				iShowBMP2(870, 555, "resources\\cross.bmp", 0);
 			}
 			if (block4_7 == 1)
 			{
-				iShowBMP2(640, 670, "cross.bmp", 0);
+				iShowBMP2(640, 670, "resources\\cross.bmp", 0);
 			}
 			if (block4_8 == 1)
 			{
-				iShowBMP2(755, 670, "cross.bmp", 0);
+				iShowBMP2(755, 670, "resources\\cross.bmp", 0);
 			}
 			if (block4_9 == 1)
 			{
-				iShowBMP2(870, 670, "cross.bmp", 0);
+				iShowBMP2(870, 670, "resources\\cross.bmp", 0);
 			}
 		}
 
@@ -1057,11 +1072,11 @@ void iDraw()
 				win_brd = 1;
 				}
 			}
-			iShowBMP(239, 40, "X_win.bmp");
-			iShowBMP(239, 350, "owon.bmp");
+			iShowBMP(239, 40, "resources\\X_win.bmp");
+			iShowBMP(239, 350, "resources\\owon.bmp");
 			if (data5 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data5 = 0;
 			}
 		}
@@ -1069,39 +1084,39 @@ void iDraw()
 		{
 			if (block1_1 == 2)
 			{
-				iShowBMP2(230, 30, "circle.bmp", 0);
+				iShowBMP2(230, 30, "resources\\circle.bmp", 0);
 			}
 			if (block1_2 == 2)
 			{
-				iShowBMP2(342, 30, "circle.bmp", 0);
+				iShowBMP2(342, 30, "resources\\circle.bmp", 0);
 			}
 			if (block1_3 == 2)
 			{
-				iShowBMP2(456, 30, "circle.bmp", 0);
+				iShowBMP2(456, 30, "resources\\circle.bmp", 0);
 			}
 			if (block1_4 == 2)
 			{
-				iShowBMP2(230, 142, "circle.bmp", 0);
+				iShowBMP2(230, 142, "resources\\circle.bmp", 0);
 			}
 			if (block1_5 == 2)
 			{
-				iShowBMP2(342, 142, "circle.bmp", 0);
+				iShowBMP2(342, 142, "resources\\circle.bmp", 0);
 			}
 			if (block1_6 == 2)
 			{
-				iShowBMP2(456, 142, "circle.bmp", 0);
+				iShowBMP2(456, 142, "resources\\circle.bmp", 0);
 			}
 			if (block1_7 == 2)
 			{
-				iShowBMP2(230, 254, "circle.bmp", 0);
+				iShowBMP2(230, 254, "resources\\circle.bmp", 0);
 			}
 			if (block1_8 == 2)
 			{
-				iShowBMP2(342, 254, "circle.bmp", 0);
+				iShowBMP2(342, 254, "resources\\circle.bmp", 0);
 			}
 			if (block1_9 == 2)
 			{
-				iShowBMP2(456, 254, "circle.bmp", 0);
+				iShowBMP2(456, 254, "resources\\circle.bmp", 0);
 			}
 		}
 
@@ -1123,11 +1138,11 @@ void iDraw()
 				win_brd1 = 1;
 				}
 			}
-			iShowBMP(239, 430, "X_win.bmp");
-			iShowBMP(239, 740, "owon.bmp");
+			iShowBMP(239, 430, "resources\\X_win.bmp");
+			iShowBMP(239, 740, "resources\\owon.bmp");
 			if (data6 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data6 = 0;
 			}
 		}
@@ -1135,39 +1150,39 @@ void iDraw()
 		{
 			if (block2_1 == 2)
 			{
-				iShowBMP2(230, 420, "circle.bmp", 0);
+				iShowBMP2(230, 420, "resources\\circle.bmp", 0);
 			}
 			if (block2_2 == 2)
 			{
-				iShowBMP2(342, 420, "circle.bmp", 0);
+				iShowBMP2(342, 420, "resources\\circle.bmp", 0);
 			}
 			if (block2_3 == 2)
 			{
-				iShowBMP2(456, 420, "circle.bmp", 0);
+				iShowBMP2(456, 420, "resources\\circle.bmp", 0);
 			}
 			if (block2_4 == 2)
 			{
-				iShowBMP2(230, 532, "circle.bmp", 0);
+				iShowBMP2(230, 532, "resources\\circle.bmp", 0);
 			}
 			if (block2_5 == 2)
 			{
-				iShowBMP2(342, 532, "circle.bmp", 0);
+				iShowBMP2(342, 532, "resources\\circle.bmp", 0);
 			}
 			if (block2_6 == 2)
 			{
-				iShowBMP2(456, 532, "circle.bmp", 0);
+				iShowBMP2(456, 532, "resources\\circle.bmp", 0);
 			}
 			if (block2_7 == 2)
 			{
-				iShowBMP2(230, 644, "circle.bmp", 0);
+				iShowBMP2(230, 644, "resources\\circle.bmp", 0);
 			}
 			if (block2_8 == 2)
 			{
-				iShowBMP2(342, 644, "circle.bmp", 0);
+				iShowBMP2(342, 644, "resources\\circle.bmp", 0);
 			}
 			if (block2_9 == 2)
 			{
-				iShowBMP2(456, 644, "circle.bmp", 0);
+				iShowBMP2(456, 644, "resources\\circle.bmp", 0);
 			}
 		}
 
@@ -1189,11 +1204,11 @@ void iDraw()
 				win_brd2 = 1;
 				}
 			}
-			iShowBMP(625, 40, "X_win.bmp");
-			iShowBMP(625, 350, "owon.bmp");
+			iShowBMP(625, 40, "resources\\X_win.bmp");
+			iShowBMP(625, 350, "resources\\owon.bmp");
 			if (data7 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data7 = 0;
 			}
 		}
@@ -1201,39 +1216,39 @@ void iDraw()
 		{
 			if (block3_1 == 2)
 			{
-				iShowBMP2(620, 30, "circle.bmp", 0);
+				iShowBMP2(620, 30, "resources\\circle.bmp", 0);
 			}
 			if (block3_2 == 2)
 			{
-				iShowBMP2(732, 30, "circle.bmp", 0);
+				iShowBMP2(732, 30, "resources\\circle.bmp", 0);
 			}
 			if (block3_3 == 2)
 			{
-				iShowBMP2(844, 30, "circle.bmp", 0);
+				iShowBMP2(844, 30, "resources\\circle.bmp", 0);
 			}
 			if (block3_4 == 2)
 			{
-				iShowBMP2(620, 142, "circle.bmp", 0);
+				iShowBMP2(620, 142, "resources\\circle.bmp", 0);
 			}
 			if (block3_5 == 2)
 			{
-				iShowBMP2(732, 142, "circle.bmp", 0);
+				iShowBMP2(732, 142, "resources\\circle.bmp", 0);
 			}
 			if (block3_6 == 2)
 			{
-				iShowBMP2(844, 142, "circle.bmp", 0);
+				iShowBMP2(844, 142, "resources\\circle.bmp", 0);
 			}
 			if (block3_7 == 2)
 			{
-				iShowBMP2(620, 254, "circle.bmp", 0);
+				iShowBMP2(620, 254, "resources\\circle.bmp", 0);
 			}
 			if (block3_8 == 2)
 			{
-				iShowBMP2(732, 254, "circle.bmp", 0);
+				iShowBMP2(732, 254, "resources\\circle.bmp", 0);
 			}
 			if (block3_9 == 2)
 			{
-				iShowBMP2(844, 254, "circle.bmp", 0);
+				iShowBMP2(844, 254, "resources\\circle.bmp", 0);
 			}
 		}
 
@@ -1255,11 +1270,11 @@ void iDraw()
 				win_brd3 = 1;
 				}
 			}
-			iShowBMP(625, 430, "X_win.bmp");
-			iShowBMP(625, 740, "owon.bmp");
+			iShowBMP(625, 430, "resources\\X_win.bmp");
+			iShowBMP(625, 740, "resources\\owon.bmp");
 			if (data8 == 1)
 			{
-				PlaySound("win_m.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\win_m.wav", NULL, SND_ASYNC);
 				data8 = 0;
 			}
 		}
@@ -1267,63 +1282,73 @@ void iDraw()
 		{
 			if (block4_1 == 2)
 			{
-				iShowBMP2(620, 420, "circle.bmp", 0);
+				iShowBMP2(620, 420, "resources\\circle.bmp", 0);
 			}
 			if (block4_2 == 2)
 			{
-				iShowBMP2(732, 420, "circle.bmp", 0);
+				iShowBMP2(732, 420, "resources\\circle.bmp", 0);
 			}
 			if (block4_3 == 2)
 			{
-				iShowBMP2(844, 420, "circle.bmp", 0);
+				iShowBMP2(844, 420, "resources\\circle.bmp", 0);
 			}
 			if (block4_4 == 2)
 			{
-				iShowBMP2(620, 532, "circle.bmp", 0);
+				iShowBMP2(620, 532, "resources\\circle.bmp", 0);
 			}
 			if (block4_5 == 2)
 			{
-				iShowBMP2(732, 532, "circle.bmp", 0);
+				iShowBMP2(732, 532, "resources\\circle.bmp", 0);
 			}
 			if (block4_6 == 2)
 			{
-				iShowBMP2(844, 532, "circle.bmp", 0);
+				iShowBMP2(844, 532, "resources\\circle.bmp", 0);
 			}
 			if (block4_7 == 2)
 			{
-				iShowBMP2(620, 654, "circle.bmp", 0);
+				iShowBMP2(620, 654, "resources\\circle.bmp", 0);
 			}
 			if (block4_8 == 2)
 			{
-				iShowBMP2(732, 654, "circle.bmp", 0);
+				iShowBMP2(732, 654, "resources\\circle.bmp", 0);
 			}
 			if (block4_9 == 2)
 			{
-				iShowBMP2(844, 654, "circle.bmp", 0);
+				iShowBMP2(844, 654, "resources\\circle.bmp", 0);
 			}
 		}
 		if (current == 1)
 		{
-			iShowBMP(514, 383, "x'sturn.bmp");
+			iShowBMP(514, 383, "resources\\x'sturn.bmp");
 		}
 		else if (current == 2)
 		{
-			iShowBMP(514, 383, "o'sturn.bmp");
+			iShowBMP(514, 383, "resources\\o'sturn.bmp");
 		}
 		if(!checkWin(board_1, 'x') && !checkWin(board_1, 'o')){
 		if (checkDraw(board_1))
 		{
-			done_bord1 = 1;
-			if(win_brd == 0){
-				x_s_point += 1;
-				o_s_point += 1;
-				win_brd = 1;
+			
+			if(win_brd == 0 && done_bord1 == 0){
+				done_bord1 = 1;
+				if(hard == 1){
+					score += 3;
+				    win_brd = 1;
+				}else if(medium == 1){
+					score += 1;
+				    win_brd = 1;
+				}else{
+					x_s_point += 1;
+				    o_s_point += 1;
+				   win_brd = 1;
+				}
+				
 			}
-			iShowBMP(239, 350, "draw.bmp");
-			iShowBMP(239, 40, "X_win.bmp");
+			iShowBMP(239, 350, "resources\\draw.bmp");
+			iShowBMP(239, 40, "resources\\X_win.bmp");
 			if (dat1 == 1)
 			{
-				PlaySound("tie.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
 				dat1 = 0;
 			}
 		}
@@ -1332,17 +1357,28 @@ void iDraw()
 		if(!checkWin(board_2, 'x') && !checkWin(board_2, 'o')){
 		if (checkDraw(board_2))
 		{
-			done_bord2 = 1;
-			if(win_brd1 == 0){
-				x_s_point += 1;
-				o_s_point += 1;
-				win_brd1 = 1;
+			
+			if(win_brd1 == 0 && done_bord2 == 0){
+				done_bord2 = 1;
+				if(hard == 1){
+					score += 3;
+				    win_brd1 = 1;
+				}else if(medium == 1){
+					score += 1;
+				    win_brd1 = 1;
+				}else{
+					x_s_point += 1;
+				    o_s_point += 1;
+				    win_brd1 = 1;
+				}
+				
+				
 			}
-			iShowBMP(239, 740, "draw.bmp");
-			iShowBMP(239, 430, "X_win.bmp");
+			iShowBMP(239, 740, "resources\\draw.bmp");
+			iShowBMP(239, 430, "resources\\X_win.bmp");
 			if (dat2 == 1)
 			{
-				PlaySound("tie.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
 				dat2 = 0;
 			}
 		}
@@ -1351,17 +1387,26 @@ void iDraw()
 		if(!checkWin(board_3, 'x') && !checkWin(board_3, 'o')){
 		if (checkDraw(board_3))
 		{
-			done_bord3 = 1;
-			if(win_brd2 == 0){
-				x_s_point += 1;
-				o_s_point += 1;
-				win_brd2 = 1;
+			
+			if(win_brd2 == 0 && done_bord3 == 0){
+				done_bord3 = 1;
+				if(hard == 1){
+					score += 3;
+				    win_brd2 = 1;
+				}else if(medium == 1){
+					score += 1;
+				    win_brd2 = 1;
+				}else{
+					x_s_point += 1;
+				    o_s_point += 1;
+				    win_brd2 = 1;
+				}
 			}
-			iShowBMP(625, 350, "draw.bmp");
-			iShowBMP(625, 40, "X_win.bmp");
+			iShowBMP(625, 350, "resources\\draw.bmp");
+			iShowBMP(625, 40, "resources\\X_win.bmp");
 			if (dat3 == 1)
 			{
-				PlaySound("tie.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
 				dat3 = 0;
 			}
 		}
@@ -1370,17 +1415,27 @@ void iDraw()
 		if(!checkWin(board_4, 'x') && !checkWin(board_4, 'o')){
 		if (checkDraw(board_4))
 		{
-			done_bord4 = 1;
-			if(win_brd3 == 0){
-				x_s_point += 1;
-				o_s_point += 1;
-				win_brd3 = 1;
+			
+			if(win_brd3 == 0 && done_bord4 == 0){
+				done_bord4 = 1;
+				if(hard == 1){
+					score += 3;
+				    win_brd3 = 1;
+				}else if(medium == 1){
+					score += 1;
+				    win_brd3 = 1;
+				}else{
+					x_s_point += 1;
+				    o_s_point += 1;
+				    win_brd3 = 1;
+				}
+				
 			}
-			iShowBMP(625, 740, "draw.bmp");
-			iShowBMP(625, 430, "X_win.bmp");
+			iShowBMP(625, 740, "resources\\draw.bmp");
+			iShowBMP(625, 430, "resources\\X_win.bmp");
 			if (dat4 == 1)
 			{
-				PlaySound("tie.wav", NULL, SND_ASYNC);
+				PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
 				dat4 = 0;
 			}
 		}
@@ -1403,47 +1458,68 @@ void iMouse(int button, int state, int mx, int my)
 	if (current == 0)
 	{
 		nevigate(button, state, mx, my);
+		playmusic();
 	}else if((current == 2 || current == 1) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
-			PlaySound("move.wav", NULL, SND_ASYNC);
 			if (mx >= 567 && mx <= 630 && my >= 106 && my <= 168)
 			{
-				PlaySound("move.wav", NULL, SND_ASYNC);
-				newgame();
+				PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 				current = 0;
 				playmusic();
 				
 			}
 		}
-	}else if(current == -5){
+	}else if(current == 25){
 		settings(button, state, mx, my);
-	}else if((current == 3 || current == 4) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
+	}else if(current == 50){
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
-			PlaySound("move.wav", NULL, SND_ASYNC);
+			PlaySound("resources\\move.wav", NULL, SND_ASYNC);
+			if(mx >= 977 && mx <= 1049 && my >= 90 && my <= 200){
+				music = 1;
+			}
+			if(mx >= 15 && mx <= 106 && my >= 757 && my <= 778){
+				
+				current = 0;
+				playmusic();
+			}
+			if(mx >= 824 && mx <= 895 && my >= 90 && my <= 200){
+				music = 0;
+			}
+			
+			
+		}
+	} 
+	if((current == 3 || current == 4) && done_bord1 == 1 && done_bord2 == 1 && done_bord3 == 1 && done_bord4 == 1){
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+		{
+			
 			if (mx >= 445 && mx <= 743 && my >= 365 && my <= 414)
-			{
+			{   
+				PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 				isTextBoxActive = true;
 			}
 			
 			if(mx >= 520 && mx <= 675 && my >= 250 && my <= 288){
 				if(playerName[0] != '\0')
 			{
+				PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 				saveScore();
 				current = 0;
 				playmusic();
 			}else{
-			PlaySound("tie.wav", NULL, SND_ASYNC);
+			PlaySound("resources\\tie.wav", NULL, SND_ASYNC);
 			}
 			}
 			}
 	}else if(current == 100){
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
-			PlaySound("move.wav", NULL, SND_ASYNC);
+			
 			if (mx >= 929 && mx <= 1099 && my >= 635 && my <= 700)
 			{
+				PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 				current = 0;
 				playmusic();
 			}
@@ -1452,14 +1528,14 @@ void iMouse(int button, int state, int mx, int my)
 	
 	else if (current == 3 && easy == 0 && medium == 0 && hard == 0)
 	{
-		PlaySound("move.wav", NULL, SND_ASYNC);
+		PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 		Ai_mode(current, button, state, mx, my);
 	}
 	else
 	{
 		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		{
-			PlaySound("move.wav", NULL, SND_ASYNC);
+			PlaySound("resources\\move.wav", NULL, SND_ASYNC);
 			if (current == 1)
 
 			{
@@ -3141,25 +3217,23 @@ void iKeyboard(unsigned char key)
 {
 	if (isTextBoxActive)
     {
-        if (key == '\r')
+		 if (key == '\r')
             isTextBoxActive = false;
-        else if (key == '\b')
+        else if (key != '\b')
         {
-            int len = strlen(playerName);
-            if (len > 0)
-                playerName[len - 1] = '\0';
+            playerName[idx] = key;
+			playerName[++idx] = '\0';
         }
-        else if (strlen(playerName) < playerNameLength)
+        else
         {
-            const char ch = (char)key;
-            strncat(playerName, &ch, 1);
-            // printf("%s\n", playerName);
+			if(idx <= 0){
+				idx = 0;
+			}else{
+				idx--;
+			}
+			playerName[idx] = '\0';
         }
     }
-	if (key == 'q')
-	{
-		exit(0);
-	}
 	// place your codes for other keys here
 }
 
@@ -3185,6 +3259,7 @@ int main()
 
 	current = 0;
 	playmusic();
-	iInitialize(1200, 800, "Tic-Tac-Toe");
+	idx = strlen(playerName);
+	iInitialize(1200, 800, "Tic-Tac-Toe  Developed by : ""Tafsir Al Nafin""");
 	return 0;
 }
