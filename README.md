@@ -15,33 +15,6 @@ Welcome to the Tic-Tac-Toe AI Game! This is a modern and interactive twist on th
 - **Sound Effects**: Enjoy background music and sound effects during gameplay.
 - **Settings and Rules**: Easily access game settings and rules for better understanding.
 
-## Installation
-
-### Prerequisites
-
-- A Windows-based system.
-- A C++ compiler (e.g., GCC, MinGW).
-- The `iGraphics` library installed on your system.
-
-### Steps
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/your-username/CSE-102-Project-BUET-L-1T-1.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd CSE-102-Project-BUET-L-1T-1
-   ```
-3. Compile the code:
-   ```bash
-   g++ CSE-102-Project-BUET-L-1T-1/iMain.cpp -o TicTacToe -lgraphics
-   ```
-4. Run the executable:
-   ```bash
-   ./CSE-102-Project-BUET-L-1T-1/TicTacToe
-   ```
-
 ## How to Play
 
 ### Main Menu
