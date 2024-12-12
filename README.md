@@ -35,11 +35,11 @@ Welcome to the Tic-Tac-Toe AI Game! This is a modern and interactive twist on th
    ```
 3. Compile the code:
    ```bash
-   g++ iMain.cpp -o TicTacToe -lgraphics
+   g++ CSE-102-Project-BUET-L-1T-1/iMain.cpp -o TicTacToe -lgraphics
    ```
 4. Run the executable:
    ```bash
-   ./TicTacToe
+   ./CSE-102-Project-BUET-L-1T-1/TicTacToe
    ```
 
 ## How to Play
