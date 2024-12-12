@@ -256,7 +256,7 @@ void saveScore() {
 
 	FILE *ptr = fopen("topScores.txt", "r");
 	if (ptr != NULL) {
-		while (count < 5 && fscanf(ptr, "%19s %d", players[count].name, &players[count].Score) == 2) {
+		while (count < 5 && fscanf(ptr, "%19s %d", &players[count].name, &players[count].Score) == 2) {
 			count++;
 		}
 		fclose(ptr);
@@ -297,7 +297,7 @@ void loadScore() {
 
 	FILE *ptr = fopen("topScores.txt", "r");
 	if (ptr != NULL) {
-		while (fscanf(ptr, "%19s %d", players[count].name, &players[count].Score) != EOF && count < 5) {
+		while (fscanf(ptr, "%19s %d", &players[count].name, &players[count].Score) != EOF && count < 5) {
 			count++;
 		}
 		fclose(ptr);
@@ -332,9 +332,8 @@ void drawGameOverPage()
     iSetColor(103, 217, 10);
     iFilledRectangle(445, 350, 300, 80);
     iSetColor(0, 0, 0);
-    iText(450, 410, "Player Name???", GLUT_BITMAP_TIMES_ROMAN_24);
+    iText(450, 410, "Player Name?", GLUT_BITMAP_TIMES_ROMAN_24);
     iText(450, 391, playerName, GLUT_BITMAP_TIMES_ROMAN_24);
-    // printf("%s\t %d\n", playerName, score);
 }
 
 
