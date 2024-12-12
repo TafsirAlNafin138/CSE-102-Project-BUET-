@@ -27,11 +27,11 @@ Welcome to the Tic-Tac-Toe AI Game! This is a modern and interactive twist on th
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/tic-tac-toe-ai.git
+   git clone https://github.com/your-username/CSE-102-Project-BUET-L-1T-1.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd tic-tac-toe-ai
+   cd CSE-102-Project-BUET-L-1T-1
    ```
 3. Compile the code:
    ```bash
